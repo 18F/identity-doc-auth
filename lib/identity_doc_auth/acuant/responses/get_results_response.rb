@@ -1,7 +1,7 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     module Responses
-      class GetResultsResponse < DocAuth::Response
+      class GetResultsResponse < IdentityDocAuth::Response
         def initialize(http_response)
           @http_response = http_response
           super(
@@ -32,13 +32,13 @@ module DocAuth
 
         # @return [DocAuth::Acuant::ResultCode::ResultCode]
         def result_code
-          DocAuth::Acuant::ResultCodes.from_int(parsed_response_body['Result'])
+          IdentityDocAuth::Acuant::ResultCodes.from_int(parsed_response_body['Result'])
         end
 
         def pii_from_doc
           return {} unless successful_result?
 
-          DocAuth::Acuant::PiiFromDoc.new(parsed_response_body).call
+          IdentityDocAuth::Acuant::PiiFromDoc.new(parsed_response_body).call
         end
 
         private
@@ -49,8 +49,8 @@ module DocAuth
           return {} if successful_result?
 
           unsuccessful_alerts = raw_alerts.filter do |raw_alert|
-            alert_result_code = DocAuth::Acuant::ResultCodes.from_int(raw_alert['Result'])
-            alert_result_code != DocAuth::Acuant::ResultCodes::PASSED
+            alert_result_code = IdentityDocAuth::Acuant::ResultCodes.from_int(raw_alert['Result'])
+            alert_result_code != IdentityDocAuth::Acuant::ResultCodes::PASSED
           end
 
           messages = unsuccessful_alerts.map do |alert|
@@ -79,18 +79,18 @@ module DocAuth
         end
 
         def passed_result?
-          result_code == DocAuth::Acuant::ResultCodes::PASSED
+          result_code == IdentityDocAuth::Acuant::ResultCodes::PASSED
         end
 
         def attention_with_barcode?
-          return false unless result_code == DocAuth::Acuant::ResultCodes::ATTENTION
+          return false unless result_code == IdentityDocAuth::Acuant::ResultCodes::ATTENTION
 
           raw_alerts.all? do |alert|
             error_key = FriendlyError::FindKey.call(alert['Disposition'], 'doc_auth')
-            alert_result_code = DocAuth::Acuant::ResultCodes.from_int(alert['Result'])
+            alert_result_code = IdentityDocAuth::Acuant::ResultCodes.from_int(alert['Result'])
 
-            alert_result_code == DocAuth::Acuant::ResultCodes::PASSED ||
-              (alert_result_code == DocAuth::Acuant::ResultCodes::ATTENTION &&
+            alert_result_code == IdentityDocAuth::Acuant::ResultCodes::PASSED ||
+              (alert_result_code == IdentityDocAuth::Acuant::ResultCodes::ATTENTION &&
                error_key == 'barcode_could_not_be_read')
           end
         end

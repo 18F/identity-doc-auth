@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::PiiFromDoc do
-  include DocAuthHelper
+describe IdentityDocAuth::Acuant::PiiFromDoc do
+  include IdentityDocAuthHelper
 
   subject(:pii_from_doc) { described_class.new(response_body) }
   let(:response_body) { JSON.parse(AcuantFixtures.get_results_response_success) }

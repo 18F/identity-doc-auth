@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Requests::GetResultsRequest do
+describe IdentityDocAuth::Acuant::Requests::GetResultsRequest do
   describe '#fetch' do
     let(:instance_id) { '123abc' }
     let(:url) do

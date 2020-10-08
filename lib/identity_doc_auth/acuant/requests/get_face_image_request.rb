@@ -1,7 +1,7 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     module Requests
-      class GetFaceImageRequest < DocAuth::Acuant::Request
+      class GetFaceImageRequest < IdentityDocAuth::Acuant::Request
         attr_reader :instance_id
 
         def initialize(instance_id:)
@@ -13,7 +13,7 @@ module DocAuth
         end
 
         def handle_http_response(http_response)
-          DocAuth::Acuant::Responses::GetFaceImageResponse.new(http_response)
+          IdentityDocAuth::Acuant::Responses::GetFaceImageResponse.new(http_response)
         end
 
         def method

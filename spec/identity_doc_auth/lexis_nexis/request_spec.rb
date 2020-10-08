@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::LexisNexis::Request do
+describe IdentityDocAuth::LexisNexis::Request do
   let(:account_id) { 123 }
   let(:workflow) { 'test_workflow' }
   let(:base_url) { Figaro.env.lexisnexis_base_url }
@@ -35,7 +35,7 @@ describe DocAuth::LexisNexis::Request do
       context 'with an unsuccessful http request' do
         let(:status) { 500 }
 
-        it 'returns a generic DocAuth::Response object' do
+        it 'returns a generic IdentityDocAuth::Response object' do
           response = subject.fetch
 
           expect(response.class).to eq(DocAuth::Response)
@@ -70,7 +70,7 @@ describe DocAuth::LexisNexis::Request do
       context 'with an unsuccessful http request' do
         let(:status) { 500 }
 
-        it 'returns a generic DocAuth::Response object' do
+        it 'returns a generic IdentityDocAuth::Response object' do
           response = subject.fetch
 
           expect(response.class).to eq(DocAuth::Response)

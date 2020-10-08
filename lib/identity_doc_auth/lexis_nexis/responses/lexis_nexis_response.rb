@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module DocAuth
+module IdentityDocAuth
   module LexisNexis
     module Responses
-      class LexisNexisResponse < DocAuth::Response
+      class LexisNexisResponse < IdentityDocAuth::Response
         PII_DETAILS = %w[
           Age
           DocIssuerCode

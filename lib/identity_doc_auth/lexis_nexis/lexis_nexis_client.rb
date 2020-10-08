@@ -1,4 +1,4 @@
-module DocAuth
+module IdentityDocAuth
   module LexisNexis
     class LexisNexisClient
       def create_document

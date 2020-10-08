@@ -1,7 +1,7 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     module Requests
-      class FacialMatchRequest < DocAuth::Acuant::Request
+      class FacialMatchRequest < IdentityDocAuth::Acuant::Request
         attr_reader :selfie_image, :document_face_image
 
         def initialize(selfie_image:, document_face_image:)
@@ -34,7 +34,7 @@ module DocAuth
         end
 
         def handle_http_response(http_response)
-          DocAuth::Acuant::Responses::FacialMatchResponse.new(http_response)
+          IdentityDocAuth::Acuant::Responses::FacialMatchResponse.new(http_response)
         end
 
         def method

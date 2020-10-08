@@ -1,7 +1,7 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     module Responses
-      class FacialMatchResponse < DocAuth::Response
+      class FacialMatchResponse < IdentityDocAuth::Response
         attr_reader :http_response
 
         def initialize(http_response)

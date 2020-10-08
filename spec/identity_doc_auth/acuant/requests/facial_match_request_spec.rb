@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Requests::FacialMatchRequest do
+describe IdentityDocAuth::Acuant::Requests::FacialMatchRequest do
   describe '#fetch' do
     let(:url) do
       URI.join(Figaro.env.acuant_facial_match_url, '/api/v1/facematch')
@@ -26,8 +26,8 @@ describe DocAuth::Acuant::Requests::FacialMatchRequest do
                        to_return(body: response_body)
 
         response = described_class.new(
-          selfie_image: DocAuthImageFixtures.selfie_image,
-          document_face_image: DocAuthImageFixtures.document_face_image,
+          selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+          document_face_image: IdentityDocAuthImageFixtures.document_face_image,
         ).fetch
 
         expect(response.success?).to eq(true)
@@ -46,8 +46,8 @@ describe DocAuth::Acuant::Requests::FacialMatchRequest do
                        to_return(body: response_body)
 
         response = described_class.new(
-          selfie_image: DocAuthImageFixtures.selfie_image,
-          document_face_image: DocAuthImageFixtures.document_face_image,
+          selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+          document_face_image: IdentityDocAuthImageFixtures.document_face_image,
         ).fetch
 
         expect(response.success?).to eq(false)

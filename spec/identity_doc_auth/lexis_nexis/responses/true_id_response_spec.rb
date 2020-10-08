@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'faraday'
 
-describe DocAuth::LexisNexis::Responses::TrueIdResponse do
+describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
   let(:success_response_body) { LexisNexisFixtures.true_id_response_success_2 }
   let(:success_response) do
     instance_double(Faraday::Response, status: 200, body: success_response_body)

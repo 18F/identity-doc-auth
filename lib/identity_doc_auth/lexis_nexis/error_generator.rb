@@ -1,4 +1,4 @@
-module DocAuth
+module IdentityDocAuth
   module LexisNexis
     class UnknownTrueIDError < StandardError; end
     class UnknownTrueIDAlert < StandardError; end

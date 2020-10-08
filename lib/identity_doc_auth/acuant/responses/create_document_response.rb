@@ -1,7 +1,7 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     module Responses
-      class CreateDocumentResponse < DocAuth::Response
+      class CreateDocumentResponse < IdentityDocAuth::Response
         attr_reader :instance_id
 
         def initialize(http_response)

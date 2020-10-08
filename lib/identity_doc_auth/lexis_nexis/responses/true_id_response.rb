@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module DocAuth
+module IdentityDocAuth
   module LexisNexis
     module Responses
       class TrueIdResponse < LexisNexisResponse
@@ -50,7 +50,7 @@ module DocAuth
             LivenessChecking: @liveness_checking_enabled,
             ProductType: 'TrueID',
             TransactionReasonCode: transaction_reason_code,
-            DocAuthResult: doc_auth_result,
+            IdentityDocAuthResult: doc_auth_result,
             Alerts: alerts,
             AlertFailureCount: alerts[:failed].length,
             PortraitMatchResults: true_id_product[:PORTRAIT_MATCH_RESULT],

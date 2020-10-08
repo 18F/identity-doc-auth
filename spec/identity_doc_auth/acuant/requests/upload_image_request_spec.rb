@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Requests::UploadImageRequest do
+describe IdentityDocAuth::Acuant::Requests::UploadImageRequest do
   let(:instance_id) { '123abc' }
   let(:url) do
     URI.join(Figaro.env.acuant_assure_id_url, "/AssureIDService/Document/#{instance_id}/Image")
@@ -10,11 +10,11 @@ describe DocAuth::Acuant::Requests::UploadImageRequest do
     it 'uploads the image and returns a successful result' do
       request_stub = stub_request(:post, url).with(
         query: { side: 0, light: 0 },
-        body: DocAuthImageFixtures.document_front_image,
+        body: IdentityDocAuthImageFixtures.document_front_image,
       ).to_return(body: '', status: 201)
 
       request = described_class.new(
-        image_data: DocAuthImageFixtures.document_front_image,
+        image_data: IdentityDocAuthImageFixtures.document_front_image,
         instance_id: instance_id,
         side: :front,
       )
@@ -31,11 +31,11 @@ describe DocAuth::Acuant::Requests::UploadImageRequest do
     it 'uploads the image and returns a successful result' do
       request_stub = stub_request(:post, url).with(
         query: { side: 1, light: 0 },
-        body: DocAuthImageFixtures.document_back_image,
+        body: IdentityDocAuthImageFixtures.document_back_image,
       ).to_return(body: '', status: 201)
 
       request = described_class.new(
-        image_data: DocAuthImageFixtures.document_back_image,
+        image_data: IdentityDocAuthImageFixtures.document_back_image,
         instance_id: instance_id,
         side: :back,
       )

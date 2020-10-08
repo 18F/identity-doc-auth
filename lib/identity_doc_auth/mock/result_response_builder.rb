@@ -1,4 +1,4 @@
-module DocAuth
+module IdentityDocAuth
   module Mock
     class ResultResponseBuilder
       DEFAULT_PII_FROM_DOC = {
@@ -24,7 +24,7 @@ module DocAuth
       end
 
       def call
-        DocAuth::Response.new(
+        IdentityDocAuth::Response.new(
           success: success?,
           errors: errors,
           pii_from_doc: pii_from_doc,

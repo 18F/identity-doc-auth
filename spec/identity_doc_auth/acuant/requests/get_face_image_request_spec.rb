@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Requests::GetFaceImageRequest do
+describe IdentityDocAuth::Acuant::Requests::GetFaceImageRequest do
   describe '#fetch' do
     let(:instance_id) { '123abc' }
     let(:url) do

@@ -1,7 +1,7 @@
-module DocAuth
+module IdentityDocAuth
   module Mock
     module Responses
-      class CreateDocumentResponse < DocAuth::Response
+      class CreateDocumentResponse < IdentityDocAuth::Response
         attr_reader :instance_id
 
         def initialize(instance_id:, success: true, errors: [], exception: nil)

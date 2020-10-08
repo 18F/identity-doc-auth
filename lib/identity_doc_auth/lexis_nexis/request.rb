@@ -1,4 +1,4 @@
-module DocAuth
+module IdentityDocAuth
   module LexisNexis
     class Request
       def fetch
@@ -38,7 +38,7 @@ module DocAuth
 
       def handle_connection_error(exception)
         NewRelic::Agent.notice_error(exception)
-        DocAuth::Response.new(
+        IdentityDocAuth::Response.new(
           success: false,
           errors: { network: I18n.t('doc_auth.errors.lexis_nexis.network_error') },
           exception: exception,

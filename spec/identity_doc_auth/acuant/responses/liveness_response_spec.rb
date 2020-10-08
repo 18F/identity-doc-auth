@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Responses::LivenessResponse do
+describe IdentityDocAuth::Acuant::Responses::LivenessResponse do
   context 'when the response is successful' do
     it 'returns a successful resposne with no errors' do
       http_response = instance_double(

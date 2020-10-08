@@ -1,7 +1,7 @@
 # rubocop:disable Lint/UnusedMethodArgument
-module DocAuth
+module IdentityDocAuth
   module Mock
-    class DocAuthMockClient
+    class IdentityDocAuthMockClient
       class << self
         attr_reader :response_mocks
         attr_accessor :last_uploaded_front_image
@@ -32,21 +32,21 @@ module DocAuth
         return mocked_response_for_method(__method__) if method_mocked?(__method__)
 
         self.class.last_uploaded_front_image = image
-        DocAuth::Response.new(success: true)
+        IdentityDocAuth::Response.new(success: true)
       end
 
       def post_back_image(image:, instance_id:)
         return mocked_response_for_method(__method__) if method_mocked?(__method__)
 
         self.class.last_uploaded_back_image = image
-        DocAuth::Response.new(success: true)
+        IdentityDocAuth::Response.new(success: true)
       end
 
       def post_selfie(image:, instance_id:)
         return mocked_response_for_method(__method__) if method_mocked?(__method__)
 
         self.class.last_uploaded_selfie_image = image
-        DocAuth::Response.new(success: true)
+        IdentityDocAuth::Response.new(success: true)
       end
 
       def post_images(front_image:, back_image:, selfie_image:, liveness_checking_enabled: nil)

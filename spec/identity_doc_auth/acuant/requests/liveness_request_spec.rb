@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Requests::LivenessRequest do
+describe IdentityDocAuth::Acuant::Requests::LivenessRequest do
   describe '#fetch' do
     let(:url) do
       URI.join(Figaro.env.acuant_passlive_url, '/api/v1/liveness')
@@ -23,7 +23,7 @@ describe DocAuth::Acuant::Requests::LivenessRequest do
                        with(body: request_body).
                        to_return(body: response_body)
 
-        response = described_class.new(image: DocAuthImageFixtures.selfie_image).fetch
+        response = described_class.new(image: IdentityDocAuthImageFixtures.selfie_image).fetch
 
         expect(response.success?).to eq(true)
         expect(response.errors).to eq({})
@@ -40,7 +40,7 @@ describe DocAuth::Acuant::Requests::LivenessRequest do
                        with(body: request_body).
                        to_return(body: response_body)
 
-        response = described_class.new(image: DocAuthImageFixtures.selfie_image).fetch
+        response = described_class.new(image: IdentityDocAuthImageFixtures.selfie_image).fetch
 
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(selfie: I18n.t('errors.doc_auth.selfie'))

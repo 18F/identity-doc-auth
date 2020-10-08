@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Responses::GetFaceImageResponse do
+describe IdentityDocAuth::Acuant::Responses::GetFaceImageResponse do
   it 'contains the face image from the response' do
     http_response = instance_double(
       Faraday::Response,

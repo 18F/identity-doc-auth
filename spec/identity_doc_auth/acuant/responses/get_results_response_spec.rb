@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Responses::GetResultsResponse do
+describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
   subject(:response) { described_class.new(http_response) }
 
   context 'with a successful result' do

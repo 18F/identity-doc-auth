@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-describe DocAuth::Mock::DocAuthMockClient do
+describe IdentityDocAuth::Mock::DocAuthMockClient do
   subject(:client) { described_class.new }
 
   it 'implements the same public methods as the real Acuant client' do
     expect(
       described_class.instance_methods.sort,
     ).to eq(
-      DocAuth::Acuant::AcuantClient.instance_methods.sort,
+      IdentityDocAuth::Acuant::AcuantClient.instance_methods.sort,
     )
   end
 
@@ -16,17 +16,17 @@ describe DocAuth::Mock::DocAuthMockClient do
     instance_id = create_document_response.instance_id
     post_front_image_response = client.post_front_image(
       instance_id: instance_id,
-      image: DocAuthImageFixtures.document_front_image,
+      image: IdentityDocAuthImageFixtures.document_front_image,
     )
     post_back_image_response = client.post_back_image(
       instance_id: instance_id,
-      image: DocAuthImageFixtures.document_back_image,
+      image: IdentityDocAuthImageFixtures.document_back_image,
     )
     get_results_response = client.get_results(instance_id: instance_id)
 
     selfie_response = client.post_selfie(
       instance_id: instance_id,
-      image: DocAuthImageFixtures.selfie_image,
+      image: IdentityDocAuthImageFixtures.selfie_image,
     )
 
     expect(create_document_response.success?).to eq(true)
@@ -112,9 +112,9 @@ describe DocAuth::Mock::DocAuthMockClient do
 
   context 'when checking results gives a failure' do
     before do
-      DocAuth::Mock::DocAuthMockClient.mock_response!(
+      IdentityDocAuth::Mock::DocAuthMockClient.mock_response!(
         method: :get_results,
-        response: DocAuth::Response.new(
+        response: IdentityDocAuth::Response.new(
           success: false,
           errors: { back_image: 'blurry' },
         ),
@@ -123,8 +123,8 @@ describe DocAuth::Mock::DocAuthMockClient do
 
     it 'returns a failure response if the results failed' do
       post_images_response = client.post_images(
-        front_image: DocAuthImageFixtures.document_front_image,
-        back_image: DocAuthImageFixtures.document_back_image,
+        front_image: IdentityDocAuthImageFixtures.document_front_image,
+        back_image: IdentityDocAuthImageFixtures.document_back_image,
         selfie_image: nil,
       )
 

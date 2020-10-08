@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DocAuth::Acuant::Responses::CreateDocumentResponse do
+describe IdentityDocAuth::Acuant::Responses::CreateDocumentResponse do
   it 'contains the instance_id from the response' do
     http_response = instance_double(
       Faraday::Response,

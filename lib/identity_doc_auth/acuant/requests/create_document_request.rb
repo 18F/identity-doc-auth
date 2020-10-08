@@ -1,7 +1,7 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     module Requests
-      class CreateDocumentRequest < DocAuth::Acuant::Request
+      class CreateDocumentRequest < IdentityDocAuth::Acuant::Request
         def path
           '/AssureIDService/Document/Instance'
         end
@@ -33,7 +33,7 @@ module DocAuth
         end
 
         def handle_http_response(response)
-          DocAuth::Acuant::Responses::CreateDocumentResponse.new(response)
+          IdentityDocAuth::Acuant::Responses::CreateDocumentResponse.new(response)
         end
 
         def method

@@ -1,4 +1,4 @@
-module DocAuth
+module IdentityDocAuth
   class ImageUploadPresignedUrlGenerator
     include AwsS3Helper
 

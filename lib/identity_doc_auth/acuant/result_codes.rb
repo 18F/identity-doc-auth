@@ -1,4 +1,4 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     module ResultCodes
       ResultCode = Struct.new(:code, :name, :billed) do

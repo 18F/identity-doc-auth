@@ -1,4 +1,4 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     class AcuantClient
       def create_document

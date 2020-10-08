@@ -1,7 +1,7 @@
-module DocAuth
+module IdentityDocAuth
   module LexisNexis
     module Requests
-      class TrueIdRequest < DocAuth::LexisNexis::Request
+      class TrueIdRequest < IdentityDocAuth::LexisNexis::Request
         attr_reader :front_image, :back_image, :selfie_image, :liveness_checking_enabled
 
         def initialize(

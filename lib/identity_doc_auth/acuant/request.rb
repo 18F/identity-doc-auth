@@ -1,4 +1,4 @@
-module DocAuth
+module IdentityDocAuth
   module Acuant
     class Request
       def path
@@ -92,7 +92,7 @@ module DocAuth
         ].join(' ')
         exception = RuntimeError.new(message)
         NewRelic::Agent.notice_error(exception)
-        DocAuth::Response.new(
+        IdentityDocAuth::Response.new(
           success: false,
           errors: { network: I18n.t('errors.doc_auth.acuant_network_error') },
           exception: exception,
@@ -101,7 +101,7 @@ module DocAuth
 
       def handle_connection_error(exception)
         NewRelic::Agent.notice_error(exception)
-        DocAuth::Response.new(
+        IdentityDocAuth::Response.new(
           success: false,
           errors: { network: I18n.t('errors.doc_auth.acuant_network_error') },
           exception: exception,

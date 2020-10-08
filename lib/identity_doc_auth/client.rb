@@ -1,13 +1,13 @@
-module DocAuth
+module IdentityDocAuth
   module Client
     def self.client
       case doc_auth_vendor
       when 'acuant'
-        DocAuth::Acuant::AcuantClient.new
+        IdentityDocAuth::Acuant::AcuantClient.new
       when 'lexisnexis'
-        DocAuth::LexisNexis::LexisNexisClient.new
+        IdentityDocAuth::LexisNexis::LexisNexisClient.new
       when 'mock'
-        DocAuth::Mock::DocAuthMockClient.new
+        IdentityDocAuth::Mock::DocAuthMockClient.new
       else
         raise "#{doc_auth_vendor} is not a valid doc auth vendor"
       end
