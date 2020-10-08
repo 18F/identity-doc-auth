@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::Mock::DocAuthMockClient do
   subject(:client) { described_class.new }

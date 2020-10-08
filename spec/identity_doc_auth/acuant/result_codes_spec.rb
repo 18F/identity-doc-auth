@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Acuant::ResultCodes do
   describe '.from_int' do

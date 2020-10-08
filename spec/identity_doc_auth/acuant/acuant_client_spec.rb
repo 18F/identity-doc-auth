@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::Acuant::AcuantClient do
   describe '#create_document' do

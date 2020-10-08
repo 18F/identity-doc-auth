@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::LexisNexis::Requests::TrueIdRequest do
   let(:account_id) { 'test_account' }

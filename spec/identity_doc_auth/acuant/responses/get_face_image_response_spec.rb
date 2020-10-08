@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::Acuant::Responses::GetFaceImageResponse do
   it 'contains the face image from the response' do

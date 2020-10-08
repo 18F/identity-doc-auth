@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::LexisNexis::LexisNexisClient do
   let(:liveness_enabled) { true }

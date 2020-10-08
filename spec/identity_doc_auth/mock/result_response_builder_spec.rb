@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::Mock::ResultResponseBuilder do
   describe '#call' do

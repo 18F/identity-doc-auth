@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
   subject(:response) { described_class.new(http_response) }

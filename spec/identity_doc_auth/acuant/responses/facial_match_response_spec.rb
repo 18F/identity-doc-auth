@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::Acuant::Responses::FacialMatchResponse do
   context 'when the response is successful' do

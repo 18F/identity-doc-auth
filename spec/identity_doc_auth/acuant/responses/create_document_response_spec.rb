@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::Acuant::Responses::CreateDocumentResponse do
   it 'contains the instance_id from the response' do

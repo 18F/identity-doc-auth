@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
   describe '#fetch' do
