@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Requests::GetResultsRequest do
+RSpec.describe IdentityDocAuth::Acuant::Requests::GetResultsRequest do
   describe '#fetch' do
     let(:instance_id) { '123abc' }
     let(:url) do

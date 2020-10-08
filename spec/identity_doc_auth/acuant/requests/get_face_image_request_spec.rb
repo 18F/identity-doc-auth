@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Requests::GetFaceImageRequest do
+RSpec.describe IdentityDocAuth::Acuant::Requests::GetFaceImageRequest do
   describe '#fetch' do
     let(:instance_id) { '123abc' }
     let(:url) do

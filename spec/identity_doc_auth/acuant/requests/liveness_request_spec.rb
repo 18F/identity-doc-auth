@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Requests::LivenessRequest do
+RSpec.describe IdentityDocAuth::Acuant::Requests::LivenessRequest do
   describe '#fetch' do
     let(:url) do
       URI.join(Figaro.env.acuant_passlive_url, '/api/v1/liveness')

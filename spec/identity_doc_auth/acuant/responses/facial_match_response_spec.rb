@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Responses::FacialMatchResponse do
+RSpec.describe IdentityDocAuth::Acuant::Responses::FacialMatchResponse do
   context 'when the response is successful' do
     it 'returns a successful resposne with no errors' do
       http_response = instance_double(

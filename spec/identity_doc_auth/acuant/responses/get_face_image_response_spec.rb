@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Responses::GetFaceImageResponse do
+RSpec.describe IdentityDocAuth::Acuant::Responses::GetFaceImageResponse do
   it 'contains the face image from the response' do
     http_response = instance_double(
       Faraday::Response,

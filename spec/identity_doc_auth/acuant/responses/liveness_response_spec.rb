@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Responses::LivenessResponse do
+RSpec.describe IdentityDocAuth::Acuant::Responses::LivenessResponse do
   context 'when the response is successful' do
     it 'returns a successful resposne with no errors' do
       http_response = instance_double(

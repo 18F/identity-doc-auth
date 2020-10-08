@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::PiiFromDoc do
+RSpec.describe IdentityDocAuth::Acuant::PiiFromDoc do
   include IdentityDocAuthHelper
 
   subject(:pii_from_doc) { described_class.new(response_body) }

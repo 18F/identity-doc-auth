@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Requests::UploadImageRequest do
+RSpec.describe IdentityDocAuth::Acuant::Requests::UploadImageRequest do
   let(:instance_id) { '123abc' }
   let(:url) do
     URI.join(Figaro.env.acuant_assure_id_url, "/AssureIDService/Document/#{instance_id}/Image")

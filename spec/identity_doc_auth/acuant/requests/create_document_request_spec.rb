@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
+RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
   describe '#fetch' do
     let(:url) { URI.join(Figaro.env.acuant_assure_id_url, '/AssureIDService/Document/Instance') }
     let(:request_body) do

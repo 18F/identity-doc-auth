@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::AcuantClient do
+RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
   describe '#create_document' do
     it 'sends a create document request' do
       url = URI.join(Figaro.env.acuant_assure_id_url, '/AssureIDService/Document/Instance')

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Requests::FacialMatchRequest do
+RSpec.describe IdentityDocAuth::Acuant::Requests::FacialMatchRequest do
   describe '#fetch' do
     let(:url) do
       URI.join(Figaro.env.acuant_facial_match_url, '/api/v1/facematch')

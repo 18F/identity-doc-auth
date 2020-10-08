@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::LexisNexis::LexisNexisClient do
+RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
   let(:liveness_enabled) { true }
   let(:workflow) { Figaro.env.lexisnexis_trueid_liveness_workflow }
   let(:image_upload_url) do

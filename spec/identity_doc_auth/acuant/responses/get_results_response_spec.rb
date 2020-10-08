@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
+RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
   subject(:response) { described_class.new(http_response) }
 
   context 'with a successful result' do

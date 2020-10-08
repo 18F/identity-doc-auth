@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Mock::ResultResponseBuilder do
+RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
   describe '#call' do
     context 'with an image file' do
       it 'returns a successful response with the default PII' do

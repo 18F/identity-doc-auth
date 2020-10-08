@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Request do
+RSpec.describe IdentityDocAuth::Acuant::Request do
   let(:path) { '/test/path' }
   let(:full_url) { URI.join(Figaro.env.acuant_assure_id_url, path) }
   let(:request_body) { 'test request body' }

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::LexisNexis::Requests::TrueIdRequest do
+RSpec.describe IdentityDocAuth::LexisNexis::Requests::TrueIdRequest do
   let(:account_id) { 'test_account' }
   let(:workflow) { 'test_workflow' }
   let(:base_url) { Figaro.env.lexisnexis_base_url }

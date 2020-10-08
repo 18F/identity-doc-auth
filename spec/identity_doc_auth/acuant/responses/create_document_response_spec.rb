@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe IdentityDocAuth::Acuant::Responses::CreateDocumentResponse do
+RSpec.describe IdentityDocAuth::Acuant::Responses::CreateDocumentResponse do
   it 'contains the instance_id from the response' do
     http_response = instance_double(
       Faraday::Response,
