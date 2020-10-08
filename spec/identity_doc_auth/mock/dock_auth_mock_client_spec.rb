@@ -16,17 +16,17 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
     instance_id = create_document_response.instance_id
     post_front_image_response = client.post_front_image(
       instance_id: instance_id,
-      image: IdentityDocAuthImageFixtures.document_front_image,
+      image: DocAuthImageFixtures.document_front_image,
     )
     post_back_image_response = client.post_back_image(
       instance_id: instance_id,
-      image: IdentityDocAuthImageFixtures.document_back_image,
+      image: DocAuthImageFixtures.document_back_image,
     )
     get_results_response = client.get_results(instance_id: instance_id)
 
     selfie_response = client.post_selfie(
       instance_id: instance_id,
-      image: IdentityDocAuthImageFixtures.selfie_image,
+      image: DocAuthImageFixtures.selfie_image,
     )
 
     expect(create_document_response.success?).to eq(true)
@@ -123,8 +123,8 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
 
     it 'returns a failure response if the results failed' do
       post_images_response = client.post_images(
-        front_image: IdentityDocAuthImageFixtures.document_front_image,
-        back_image: IdentityDocAuthImageFixtures.document_back_image,
+        front_image: DocAuthImageFixtures.document_front_image,
+        back_image: DocAuthImageFixtures.document_back_image,
         selfie_image: nil,
       )
 

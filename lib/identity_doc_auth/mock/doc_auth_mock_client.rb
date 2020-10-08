@@ -1,7 +1,10 @@
+require 'securerandom'
+require 'identity_doc_auth/mock/responses/create_document_response'
+
 # rubocop:disable Lint/UnusedMethodArgument
 module IdentityDocAuth
   module Mock
-    class IdentityDocAuthMockClient
+    class DocAuthMockClient
       class << self
         attr_reader :response_mocks
         attr_accessor :last_uploaded_front_image

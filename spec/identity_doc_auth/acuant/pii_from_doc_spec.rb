@@ -1,8 +1,7 @@
 require 'spec_helper'
+require 'identity_doc_auth/acuant/pii_from_doc'
 
 RSpec.describe IdentityDocAuth::Acuant::PiiFromDoc do
-  include IdentityDocAuthHelper
-
   subject(:pii_from_doc) { described_class.new(response_body) }
   let(:response_body) { JSON.parse(AcuantFixtures.get_results_response_success) }
 
