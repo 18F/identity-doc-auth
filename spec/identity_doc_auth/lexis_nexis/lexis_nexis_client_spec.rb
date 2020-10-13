@@ -21,7 +21,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
       expect do
         subject.post_front_image(
           instance_id: 123,
-          image: IdentityDocAuthImageFixtures.document_front_image,
+          image: DocAuthImageFixtures.document_front_image,
         )
       end.to raise_error(NotImplementedError)
     end
@@ -32,7 +32,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
       expect do
         subject.post_back_image(
           instance_id: 123,
-          image: IdentityDocAuthImageFixtures.document_back_image,
+          image: DocAuthImageFixtures.document_back_image,
         )
       end.to raise_error(NotImplementedError)
     end
@@ -43,7 +43,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
       expect do
         subject.post_selfie(
           instance_id: 123,
-          image: IdentityDocAuthImageFixtures.selfie_image,
+          image: DocAuthImageFixtures.selfie_image,
         )
       end.to raise_error(NotImplementedError)
     end
@@ -72,9 +72,9 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
 
       it 'sends an upload image request for the front, back, and selfie images' do
         result = subject.post_images(
-          front_image: IdentityDocAuthImageFixtures.document_front_image,
-          back_image: IdentityDocAuthImageFixtures.document_back_image,
-          selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+          front_image: DocAuthImageFixtures.document_front_image,
+          back_image: DocAuthImageFixtures.document_back_image,
+          selfie_image: DocAuthImageFixtures.selfie_image,
           liveness_checking_enabled: liveness_enabled,
         )
 
@@ -89,8 +89,8 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
 
       it 'sends an upload image request for the front and back DL images' do
         result = subject.post_images(
-          front_image: IdentityDocAuthImageFixtures.document_front_image,
-          back_image: IdentityDocAuthImageFixtures.document_back_image,
+          front_image: DocAuthImageFixtures.document_front_image,
+          back_image: DocAuthImageFixtures.document_back_image,
           selfie_image: nil,
           liveness_checking_enabled: liveness_enabled,
         )
@@ -107,9 +107,9 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
         )
 
         result = subject.post_images(
-          front_image: IdentityDocAuthImageFixtures.document_front_image,
-          back_image: IdentityDocAuthImageFixtures.document_back_image,
-          selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+          front_image: DocAuthImageFixtures.document_front_image,
+          back_image: DocAuthImageFixtures.document_back_image,
+          selfie_image: DocAuthImageFixtures.selfie_image,
           liveness_checking_enabled: liveness_enabled,
         )
 
@@ -123,9 +123,9 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
       stub_request(:post, image_upload_url).to_return(body: '', status: 500)
 
       result = subject.post_images(
-        front_image: IdentityDocAuthImageFixtures.document_front_image,
-        back_image: IdentityDocAuthImageFixtures.document_back_image,
-        selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+        front_image: DocAuthImageFixtures.document_front_image,
+        back_image: DocAuthImageFixtures.document_back_image,
+        selfie_image: DocAuthImageFixtures.selfie_image,
         liveness_checking_enabled: liveness_enabled,
       )
 
@@ -142,9 +142,9 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
       stub_request(:post, image_upload_url).to_raise(Faraday::TimeoutError.new('Connection failed'))
 
       result = subject.post_images(
-        front_image: IdentityDocAuthImageFixtures.document_front_image,
-        back_image: IdentityDocAuthImageFixtures.document_back_image,
-        selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+        front_image: DocAuthImageFixtures.document_front_image,
+        back_image: DocAuthImageFixtures.document_back_image,
+        selfie_image: DocAuthImageFixtures.selfie_image,
         liveness_checking_enabled: liveness_enabled,
       )
 

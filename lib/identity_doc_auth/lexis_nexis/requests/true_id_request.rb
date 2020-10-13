@@ -1,3 +1,5 @@
+require 'identity_doc_auth/lexis_nexis/request'
+
 module IdentityDocAuth
   module LexisNexis
     module Requests

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'identity_doc_auth/lexis_nexis/error_generator'
+require 'identity_doc_auth/lexis_nexis/responses/lexis_nexis_response'
+
 module IdentityDocAuth
   module LexisNexis
     module Responses

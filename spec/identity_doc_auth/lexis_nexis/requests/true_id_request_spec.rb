@@ -8,9 +8,9 @@ RSpec.describe IdentityDocAuth::LexisNexis::Requests::TrueIdRequest do
   let(:full_url) { base_url + path }
   let(:subject) do
     described_class.new(
-      front_image: IdentityDocAuthImageFixtures.document_front_image,
-      back_image: IdentityDocAuthImageFixtures.document_back_image,
-      selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+      front_image: DocAuthImageFixtures.document_front_image,
+      back_image: DocAuthImageFixtures.document_back_image,
+      selfie_image: DocAuthImageFixtures.selfie_image,
       liveness_checking_enabled: true,
     )
   end

@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+require 'identity_doc_auth/response'
+require 'json'
+require 'active_support/core_ext/hash/indifferent_access'
+
+
 module IdentityDocAuth
   module LexisNexis
     module Responses

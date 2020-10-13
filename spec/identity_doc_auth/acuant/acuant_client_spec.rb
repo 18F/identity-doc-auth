@@ -23,7 +23,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
 
       result = subject.post_front_image(
         instance_id: instance_id,
-        image: IdentityDocAuthImageFixtures.document_front_image,
+        image: DocAuthImageFixtures.document_front_image,
       )
 
       expect(result.success?).to eq(true)
@@ -40,7 +40,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
 
       result = subject.post_back_image(
         instance_id: instance_id,
-        image: IdentityDocAuthImageFixtures.document_back_image,
+        image: DocAuthImageFixtures.document_back_image,
       )
 
       expect(result.success?).to eq(true)
@@ -95,9 +95,9 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
           to_return(body: AcuantFixtures.liveness_response_success)
 
         result = subject.post_images(
-          front_image: IdentityDocAuthImageFixtures.document_front_image,
-          back_image: IdentityDocAuthImageFixtures.document_back_image,
-          selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+          front_image: DocAuthImageFixtures.document_front_image,
+          back_image: DocAuthImageFixtures.document_back_image,
+          selfie_image: DocAuthImageFixtures.selfie_image,
           liveness_checking_enabled: liveness_enabled,
         )
 
@@ -109,9 +109,9 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
     context 'with liveness checking disabled' do
       it 'sends an upload image request for the front and back DL images' do
         result = subject.post_images(
-          front_image: IdentityDocAuthImageFixtures.document_front_image,
-          back_image: IdentityDocAuthImageFixtures.document_back_image,
-          selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+          front_image: DocAuthImageFixtures.document_front_image,
+          back_image: DocAuthImageFixtures.document_back_image,
+          selfie_image: DocAuthImageFixtures.selfie_image,
           liveness_checking_enabled: liveness_enabled,
         )
 
@@ -126,9 +126,9 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
         stub_request(:get, url).to_return(body: AcuantFixtures.get_results_response_failure)
 
         result = subject.post_images(
-          front_image: IdentityDocAuthImageFixtures.document_front_image,
-          back_image: IdentityDocAuthImageFixtures.document_back_image,
-          selfie_image: IdentityDocAuthImageFixtures.selfie_image,
+          front_image: DocAuthImageFixtures.document_front_image,
+          back_image: DocAuthImageFixtures.document_back_image,
+          selfie_image: DocAuthImageFixtures.selfie_image,
           liveness_checking_enabled: liveness_enabled,
         )
 
@@ -215,7 +215,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
 
         result = subject.post_selfie(
           instance_id: instance_id,
-          image: IdentityDocAuthImageFixtures.selfie_image,
+          image: DocAuthImageFixtures.selfie_image,
         )
 
         expect(result.success?).to eq(true)
@@ -233,7 +233,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
 
         result = subject.post_selfie(
           instance_id: instance_id,
-          image: IdentityDocAuthImageFixtures.selfie_image,
+          image: DocAuthImageFixtures.selfie_image,
         )
 
         expect(result.success?).to eq(false)
@@ -251,7 +251,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
 
         result = subject.post_selfie(
           instance_id: instance_id,
-          image: IdentityDocAuthImageFixtures.selfie_image,
+          image: DocAuthImageFixtures.selfie_image,
         )
 
         expect(result.success?).to eq(false)
@@ -269,7 +269,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
 
         result = subject.post_selfie(
           instance_id: instance_id,
-          image: IdentityDocAuthImageFixtures.selfie_image,
+          image: DocAuthImageFixtures.selfie_image,
         )
 
         expect(result.success?).to eq(false)
