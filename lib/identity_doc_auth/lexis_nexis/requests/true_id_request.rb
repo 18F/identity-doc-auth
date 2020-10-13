@@ -7,11 +7,13 @@ module IdentityDocAuth
         attr_reader :front_image, :back_image, :selfie_image, :liveness_checking_enabled
 
         def initialize(
+          config:,
           front_image:,
           back_image:,
           selfie_image: nil,
           liveness_checking_enabled: nil
         )
+          super(config: config)
           @front_image = front_image
           @back_image = back_image
           @selfie_image = selfie_image
@@ -35,7 +37,7 @@ module IdentityDocAuth
         end
 
         def handle_http_response(http_response)
-          LexisNexis::Responses::TrueIdResponse.new(http_response, liveness_checking_enabled)
+          LexisNexis::Responses::TrueIdResponse.new(http_response, liveness_checking_enabled, config)
         end
 
         def method
@@ -43,22 +45,22 @@ module IdentityDocAuth
         end
 
         def account_id
-          Figaro.env.lexisnexis_trueid_account_id
+          config.trueid_account_id
         end
 
         def username
-          Figaro.env.lexisnexis_trueid_username
+          config.trueid_username
         end
 
         def password
-          Figaro.env.lexisnexis_trueid_password
+          config.trueid_password
         end
 
         def workflow
           if liveness_checking_enabled
-            Figaro.env.lexisnexis_trueid_liveness_workflow
+            config.trueid_liveness_workflow
           else
-            Figaro.env.lexisnexis_trueid_noliveness_workflow
+            config.trueid_noliveness_workflow
           end
         end
 

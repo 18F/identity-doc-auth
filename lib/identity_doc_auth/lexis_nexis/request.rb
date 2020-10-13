@@ -1,6 +1,14 @@
+require 'faraday'
+
 module IdentityDocAuth
   module LexisNexis
     class Request
+      attr_reader :config
+
+      def initialize(config:)
+        @config = config
+      end
+
       def fetch
         http_response = send_http_request
         return handle_invalid_response(http_response) unless http_response.success?
@@ -37,10 +45,10 @@ module IdentityDocAuth
       end
 
       def handle_connection_error(exception)
-        NewRelic::Agent.notice_error(exception)
+        config.exception_notifier&.call(exception)
         IdentityDocAuth::Response.new(
           success: false,
-          errors: { network: I18n.t('doc_auth.errors.lexis_nexis.network_error') },
+          errors: { network: config.i18n.t('doc_auth.errors.lexis_nexis.network_error') },
           exception: exception,
         )
       end
@@ -63,7 +71,7 @@ module IdentityDocAuth
           backoff_factor: 2,
           retry_statuses: [404, 500],
           retry_block: lambda do |_env, _options, retries, exc|
-            NewRelic::Agent.notice_error(exc, custom_params: { retry: retries })
+            config.exception_notifier&.call(exc, retry: retries)
           end,
         }
 
@@ -75,7 +83,7 @@ module IdentityDocAuth
       end
 
       def faraday_request_params
-        timeout = Figaro.env.lexisnexis_timeout&.to_i || 45
+        timeout = config.timeout&.to_i || 45
         { open_timeout: timeout, timeout: timeout }
       end
 
@@ -88,7 +96,7 @@ module IdentityDocAuth
       end
 
       def url
-        URI.join(Figaro.env.lexisnexis_base_url, path)
+        URI.join(config.base_url, path)
       end
 
       def headers
@@ -103,7 +111,7 @@ module IdentityDocAuth
           Type: 'Initiate',
           Settings: {
             Mode: request_mode,
-            Locale: I18n.locale,
+            Locale: config.i18n.locale,
             Venue: 'online',
             Reference: uuid,
           },
@@ -124,7 +132,7 @@ module IdentityDocAuth
       end
 
       def account_id
-        Figaro.env.lexisnexis_account_id
+        config.account_id
       end
 
       def workflow
@@ -136,7 +144,7 @@ module IdentityDocAuth
       end
 
       def request_mode
-        Figaro.env.lexisnexis_request_mode
+        config.request_mode
       end
     end
   end

@@ -1,4 +1,5 @@
 require "bundler/setup"
+require "webmock/rspec"
 require "identity-doc-auth"
 
 Dir['spec/support/**/*.rb'].each do |support_path|

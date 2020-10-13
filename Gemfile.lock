@@ -14,14 +14,19 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
       zeitwerk (~> 2.2, >= 2.2.2)
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
     concurrent-ruby (1.1.7)
+    crack (0.4.4)
     diff-lcs (1.4.4)
     faraday (1.0.1)
       multipart-post (>= 1.2, < 3)
+    hashdiff (1.0.1)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     minitest (5.14.2)
     multipart-post (2.1.1)
+    public_suffix (4.0.6)
     rake (12.3.3)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
@@ -39,6 +44,10 @@ GEM
     thread_safe (0.3.6)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
+    webmock (3.9.2)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     zeitwerk (2.4.0)
 
 PLATFORMS
@@ -48,6 +57,7 @@ DEPENDENCIES
   identity-doc-auth!
   rake (~> 12.0)
   rspec (~> 3.0)
+  webmock
 
 BUNDLED WITH
    2.1.4

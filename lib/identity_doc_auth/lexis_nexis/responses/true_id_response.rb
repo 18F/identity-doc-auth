@@ -7,8 +7,11 @@ module IdentityDocAuth
   module LexisNexis
     module Responses
       class TrueIdResponse < LexisNexisResponse
-        def initialize(http_response, liveness_checking_enabled)
+        attr_reader :config
+
+        def initialize(http_response, liveness_checking_enabled, config)
           @liveness_checking_enabled = liveness_checking_enabled
+          @config = config
 
           super http_response
         end
@@ -22,7 +25,7 @@ module IdentityDocAuth
         def error_messages
           return {} if successful_result?
 
-          ErrorGenerator.generate_trueid_errors(response_info, @liveness_checking_enabled)
+          ErrorGenerator.new(config).generate_trueid_errors(response_info, @liveness_checking_enabled)
         end
 
         def extra_attributes

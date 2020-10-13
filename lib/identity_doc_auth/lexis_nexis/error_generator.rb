@@ -4,6 +4,12 @@ module IdentityDocAuth
     class UnknownTrueIDAlert < StandardError; end
 
     class ErrorGenerator
+      attr_reader :config
+
+      def initialize(config)
+        @config = config
+      end
+
       # These constants are the key names for the TrueID errors hash that is returned
       ID = :id
       FRONT = :front
@@ -59,7 +65,7 @@ module IdentityDocAuth
       # rubocop:enable Layout/LineLength
 
       # rubocop:disable Metrics/PerceivedComplexity
-      def self.generate_trueid_errors(response_info, liveness_enabled)
+      def generate_trueid_errors(response_info, liveness_enabled)
         user_error_count = response_info[:AlertFailureCount]
 
         errors = get_error_messages(liveness_enabled, response_info)
@@ -69,7 +75,7 @@ module IdentityDocAuth
 
         if user_error_count.zero?
           e = UnknownTrueIDError.new('LN TrueID failure escaped without useful errors')
-          NewRelic::Agent.notice_error(e, { custom_params: { response_info: response_info } })
+          config.exception_notifier&.call(e, response_info: response_info)
 
           return { GENERAL => [general_error(liveness_enabled)] }
         # if the user_error_count is 1 it is just passed along
@@ -81,9 +87,9 @@ module IdentityDocAuth
             when ID
               errors[ID] = Set[general_error(false)]
             when FRONT
-              errors[FRONT] = Set[I18n.t('doc_auth.errors.lexis_nexis.multiple_front_id_failures')]
+              errors[FRONT] = Set[config.i18n.t('doc_auth.errors.lexis_nexis.multiple_front_id_failures')]
             when BACK
-              errors[BACK] = Set[I18n.t('doc_auth.errors.lexis_nexis.multiple_back_id_failures')]
+              errors[BACK] = Set[config.i18n.t('doc_auth.errors.lexis_nexis.multiple_back_id_failures')]
             end
           elsif error_fields.length > 1
             return { GENERAL => [general_error(liveness_enabled)] } if error_fields.include?(SELFIE)
@@ -99,7 +105,7 @@ module IdentityDocAuth
 
       # private
 
-      def self.get_error_messages(liveness_enabled, response_info)
+      def get_error_messages(liveness_enabled, response_info)
         errors = Hash.new { |hash, key| hash[key] = Set.new }
 
         if response_info[:DocAuthResult] != 'Passed'
@@ -107,28 +113,28 @@ module IdentityDocAuth
             alert_msg_hash = TRUE_ID_MESSAGES[alert[:name].to_sym]
 
             if alert_msg_hash.present?
-              errors[alert_msg_hash[:type]].add(I18n.t(alert_msg_hash[:msg_key]))
+              errors[alert_msg_hash[:type]].add(config.i18n.t(alert_msg_hash[:msg_key]))
             end
           end
         end
 
         pm_results = response_info[:PortraitMatchResults] || {}
         if liveness_enabled && pm_results.dig(:FaceMatchResult) != 'Pass'
-          errors[SELFIE].add(I18n.t('doc_auth.errors.lexis_nexis.selfie_failure'))
+          errors[SELFIE].add(config.i18n.t('doc_auth.errors.lexis_nexis.selfie_failure'))
         end
 
         errors
       end
 
-      def self.general_error(liveness_enabled)
+      def general_error(liveness_enabled)
         if liveness_enabled
-          I18n.t('doc_auth.errors.lexis_nexis.general_error_liveness')
+          config.i18n.t('doc_auth.errors.lexis_nexis.general_error_liveness')
         else
-          I18n.t('doc_auth.errors.lexis_nexis.general_error_no_liveness')
+          config.i18n.t('doc_auth.errors.lexis_nexis.general_error_no_liveness')
         end
       end
 
-      def self.scan_for_unknown_alerts(response_info)
+      def scan_for_unknown_alerts(response_info)
         all_alerts = [*response_info[:Alerts][:failed], *response_info[:Alerts][:passed]]
 
         unknown_alerts = []
@@ -140,10 +146,8 @@ module IdentityDocAuth
 
         message = 'LN TrueID responded with alert name(s) we do not handle: ' + unknown_alerts.to_s
         e = UnknownTrueIDAlert.new(message)
-        NewRelic::Agent.notice_error(e, { custom_params: { response_info: response_info } })
+        config.exception_notifier&.call(e, response_info: response_info)
       end
-
-      private_class_method :get_error_messages, :general_error, :scan_for_unknown_alerts
     end
   end
 end

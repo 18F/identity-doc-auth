@@ -3,11 +3,21 @@ require 'spec_helper'
 RSpec.describe IdentityDocAuth::LexisNexis::Requests::TrueIdRequest do
   let(:account_id) { 'test_account' }
   let(:workflow) { 'test_workflow' }
-  let(:base_url) { Figaro.env.lexisnexis_base_url }
+  let(:base_url) { 'https://lexis.nexis.example.com' }
   let(:path) { "/restws/identity/v3/accounts/#{account_id}/workflows/#{workflow}/conversations" }
   let(:full_url) { base_url + path }
+  let(:config) do
+    IdentityDocAuth::LexisNexis::Config.new(
+      i18n: FakeI18n.new,
+      trueid_account_id: account_id,
+      base_url: base_url,
+      trueid_liveness_workflow: 'test_workflow',
+      trueid_noliveness_workflow: 'test_workflow_noliveness',
+    )
+  end
   let(:subject) do
     described_class.new(
+      config: config,
       front_image: DocAuthImageFixtures.document_front_image,
       back_image: DocAuthImageFixtures.document_back_image,
       selfie_image: DocAuthImageFixtures.selfie_image,
@@ -16,8 +26,8 @@ RSpec.describe IdentityDocAuth::LexisNexis::Requests::TrueIdRequest do
   end
 
   before do
-    allow(subject).to receive(:account_id).and_return(account_id)
-    allow(subject).to receive(:workflow).and_return(workflow)
+    # allow(subject).to receive(:account_id).and_return(account_id)
+    # allow(subject).to receive(:workflow).and_return(workflow)
   end
 
   context 'with liveness checking enabled' do

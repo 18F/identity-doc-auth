@@ -3,9 +3,17 @@ require 'spec_helper'
 RSpec.describe IdentityDocAuth::LexisNexis::Request do
   let(:account_id) { 123 }
   let(:workflow) { 'test_workflow' }
-  let(:base_url) { Figaro.env.lexisnexis_base_url }
+  let(:base_url) { 'https://lexis.nexis.example.com' }
   let(:path) { "/restws/identity/v3/accounts/#{account_id}/workflows/#{workflow}/conversations" }
   let(:full_url) { base_url + path }
+
+  let(:config) do
+    IdentityDocAuth::LexisNexis::Config.new(
+      base_url: base_url,
+      i18n: instance_double('I18n', t: 'string', locale: :en),
+    )
+  end
+  subject(:request) { IdentityDocAuth::LexisNexis::Request.new(config: config) }
 
   describe '#fetch' do
     before do
@@ -38,7 +46,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Request do
         it 'returns a generic IdentityDocAuth::Response object' do
           response = subject.fetch
 
-          expect(response.class).to eq(DocAuth::Response)
+          expect(response.class).to eq(IdentityDocAuth::Response)
         end
 
         it 'includes information on the error' do
@@ -73,7 +81,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Request do
         it 'returns a generic IdentityDocAuth::Response object' do
           response = subject.fetch
 
-          expect(response.class).to eq(DocAuth::Response)
+          expect(response.class).to eq(IdentityDocAuth::Response)
         end
 
         it 'includes information on the error' do
