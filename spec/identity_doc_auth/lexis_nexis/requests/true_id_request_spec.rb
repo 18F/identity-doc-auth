@@ -25,11 +25,6 @@ RSpec.describe IdentityDocAuth::LexisNexis::Requests::TrueIdRequest do
     )
   end
 
-  before do
-    # allow(subject).to receive(:account_id).and_return(account_id)
-    # allow(subject).to receive(:workflow).and_return(workflow)
-  end
-
   context 'with liveness checking enabled' do
     it 'uploads the image and returns a successful result' do
       request_stub = stub_request(:post, full_url).to_return(body: response_body, status: 201)
