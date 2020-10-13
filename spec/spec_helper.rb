@@ -1,6 +1,6 @@
 require "bundler/setup"
 require "webmock/rspec"
-require "identity-doc-auth"
+require "identity_doc_auth"
 
 Dir['spec/support/**/*.rb'].each do |support_path|
   require File.expand_path(support_path)
