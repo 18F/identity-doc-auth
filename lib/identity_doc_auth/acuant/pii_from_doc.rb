@@ -1,3 +1,5 @@
+require 'active_support/core_ext/time/zones'
+
 module IdentityDocAuth
   module Acuant
     class PiiFromDoc

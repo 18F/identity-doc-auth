@@ -1,9 +1,16 @@
+require 'identity_doc_auth/acuant/pii_from_doc'
+require 'identity_doc_auth/acuant/result_codes'
+require 'identity_doc_auth/response'
+
 module IdentityDocAuth
   module Acuant
     module Responses
       class GetResultsResponse < IdentityDocAuth::Response
-        def initialize(http_response)
+        attr_reader :config
+
+        def initialize(http_response, config)
           @http_response = http_response
+          @config = config
           super(
             success: successful_result?,
             errors: error_messages_from_alerts,
@@ -58,7 +65,7 @@ module IdentityDocAuth
             # If a friendly message does not exist, FriendlyError::Message will return the raw alert
             # to us. In that case we respond with a general error.
             alert_message = alert['Disposition']
-            friendly_message = FriendlyError::Message.call(alert_message, 'doc_auth')
+            friendly_message = config.friendly_error_message.call(alert_message, 'doc_auth')
             next I18n.t('errors.doc_auth.general_error') if friendly_message == alert_message
             friendly_message
           end
@@ -86,7 +93,7 @@ module IdentityDocAuth
           return false unless result_code == IdentityDocAuth::Acuant::ResultCodes::ATTENTION
 
           raw_alerts.all? do |alert|
-            error_key = FriendlyError::FindKey.call(alert['Disposition'], 'doc_auth')
+            error_key = config.friendly_error_find_key.call(alert['Disposition'], 'doc_auth')
             alert_result_code = IdentityDocAuth::Acuant::ResultCodes.from_int(alert['Result'])
 
             alert_result_code == IdentityDocAuth::Acuant::ResultCodes::PASSED ||

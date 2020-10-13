@@ -1,10 +1,14 @@
+require 'identity_doc_auth/acuant/request'
+require 'identity_doc_auth/acuant/responses/facial_match_response'
+
 module IdentityDocAuth
   module Acuant
     module Requests
       class FacialMatchRequest < IdentityDocAuth::Acuant::Request
         attr_reader :selfie_image, :document_face_image
 
-        def initialize(selfie_image:, document_face_image:)
+        def initialize(config:, selfie_image:, document_face_image:)
+          super(config: config)
           @selfie_image = selfie_image
           @document_face_image = document_face_image
         end
@@ -14,7 +18,7 @@ module IdentityDocAuth
         end
 
         def url
-          URI.join(Figaro.env.acuant_facial_match_url, path)
+          URI.join(config.facial_match_url, path)
         end
 
         def path
@@ -28,7 +32,7 @@ module IdentityDocAuth
               'ImageTwo': Base64.strict_encode64(document_face_image),
             },
             'Settings': {
-              'SubscriptionId': Figaro.env.acuant_assure_id_subscription_id,
+              'SubscriptionId': config.assure_id_subscription_id,
             },
           }.to_json
         end

@@ -1,10 +1,13 @@
+require 'identity_doc_auth/acuant/responses/get_face_image_response'
+
 module IdentityDocAuth
   module Acuant
     module Requests
       class GetFaceImageRequest < IdentityDocAuth::Acuant::Request
         attr_reader :instance_id
 
-        def initialize(instance_id:)
+        def initialize(config:, instance_id:)
+          super(config: config)
           @instance_id = instance_id
         end
 

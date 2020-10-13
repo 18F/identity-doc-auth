@@ -1,3 +1,5 @@
+require 'identity_doc_auth/response'
+
 module IdentityDocAuth
   module Acuant
     module Responses

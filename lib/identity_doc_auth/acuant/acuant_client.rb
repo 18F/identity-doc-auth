@@ -1,12 +1,27 @@
+require 'identity_doc_auth/acuant/config'
+require 'identity_doc_auth/acuant/requests/create_document_request'
+require 'identity_doc_auth/acuant/requests/upload_image_request'
+require 'identity_doc_auth/acuant/requests/get_face_image_request'
+require 'identity_doc_auth/acuant/requests/facial_match_request'
+require 'identity_doc_auth/acuant/requests/liveness_request'
+require 'identity_doc_auth/acuant/requests/get_results_request'
+
 module IdentityDocAuth
   module Acuant
     class AcuantClient
+      attr_reader :config
+
+      def initialize(**config_keywords)
+        @config = Config.new(**config_keywords)
+      end
+
       def create_document
-        Requests::CreateDocumentRequest.new.fetch
+        Requests::CreateDocumentRequest.new(config: config).fetch
       end
 
       def post_front_image(image:, instance_id:)
         Requests::UploadImageRequest.new(
+          config: config,
           instance_id: instance_id,
           image_data: image,
           side: :front,
@@ -15,6 +30,7 @@ module IdentityDocAuth
 
       def post_back_image(image:, instance_id:)
         Requests::UploadImageRequest.new(
+          config: config,
           instance_id: instance_id,
           image_data: image,
           side: :back,
@@ -22,20 +38,24 @@ module IdentityDocAuth
       end
 
       def post_selfie(image:, instance_id:)
-        get_face_image_response = Requests::GetFaceImageRequest.new(instance_id: instance_id).fetch
+        get_face_image_response = Requests::GetFaceImageRequest.new(
+          config: config,
+          instance_id: instance_id
+        ).fetch
         return get_face_image_response unless get_face_image_response.success?
 
         facial_match_response = Requests::FacialMatchRequest.new(
+          config: config,
           selfie_image: image,
           document_face_image: get_face_image_response.image,
         ).fetch
-        liveness_response = Requests::LivenessRequest.new(image: image).fetch
+        liveness_response = Requests::LivenessRequest.new(config: config, image: image).fetch
 
         facial_match_response.merge(liveness_response)
       end
 
       def get_results(instance_id:)
-        Requests::GetResultsRequest.new(instance_id: instance_id).fetch
+        Requests::GetResultsRequest.new(config: config, instance_id: instance_id).fetch
       end
 
       def post_images(front_image:, back_image:, selfie_image:, liveness_checking_enabled: nil)

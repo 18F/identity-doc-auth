@@ -1,3 +1,6 @@
+require 'identity_doc_auth/acuant/request'
+require 'identity_doc_auth/acuant/responses/create_document_response'
+
 module IdentityDocAuth
   module Acuant
     module Requests
@@ -28,7 +31,7 @@ module IdentityDocAuth
             ImageCroppingMode: '1',
             ManualDocumentType: nil,
             ProcessMode: 0,
-            SubscriptionId: Figaro.env.acuant_assure_id_subscription_id,
+            SubscriptionId: config.assure_id_subscription_id,
           }.to_json
         end
 

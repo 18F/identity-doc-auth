@@ -24,7 +24,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
         result: 'Passed',
         raw_alerts: raw_alerts,
       )
-      expect(response.result_code).to eq(DocAuth::Acuant::ResultCodes::PASSED)
+      expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::PASSED)
       expect(response.result_code.billed?).to eq(true)
     end
 
@@ -98,7 +98,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
         results: [I18n.t('friendly_errors.doc_auth.document_type_could_not_be_determined')],
       )
       expect(response.exception).to be_nil
-      expect(response.result_code).to eq(DocAuth::Acuant::ResultCodes::UNKNOWN)
+      expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
       expect(response.result_code.billed?).to eq(false)
     end
 

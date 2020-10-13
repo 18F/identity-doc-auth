@@ -1,10 +1,14 @@
+require 'identity_doc_auth/acuant/request'
+require 'identity_doc_auth/response'
+
 module IdentityDocAuth
   module Acuant
     module Requests
       class UploadImageRequest < IdentityDocAuth::Acuant::Request
         attr_reader :image_data, :instance_id, :side
 
-        def initialize(image_data:, instance_id:, side:)
+        def initialize(config:, image_data:, instance_id:, side:)
+          super(config: config)
           @image_data = image_data
           @instance_id = instance_id
           @side = side

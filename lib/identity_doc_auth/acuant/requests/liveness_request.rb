@@ -1,10 +1,14 @@
+require 'identity_doc_auth/acuant/request'
+require 'identity_doc_auth/acuant/responses/liveness_response'
+
 module IdentityDocAuth
   module Acuant
     module Requests
       class LivenessRequest < IdentityDocAuth::Acuant::Request
         attr_reader :image
 
-        def initialize(image:)
+        def initialize(config:, image:)
+          super(config: config)
           @image = image
         end
 
@@ -13,7 +17,7 @@ module IdentityDocAuth
         end
 
         def url
-          URI.join(Figaro.env.acuant_passlive_url, path)
+          URI.join(config.passlive_url, path)
         end
 
         def path
@@ -23,7 +27,7 @@ module IdentityDocAuth
         def body
           {
             'Settings' => {
-              'SubscriptionId' => Figaro.env.acuant_assure_id_subscription_id,
+              'SubscriptionId' => config.assure_id_subscription_id,
               'AdditionalSettings' => { 'OS' => 'UNKNOWN' },
             },
             'Image' => Base64.strict_encode64(image),

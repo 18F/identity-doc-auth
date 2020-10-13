@@ -1,6 +1,9 @@
 require "bundler/setup"
 require "webmock/rspec"
 require "identity_doc_auth"
+require "active_support/core_ext/time/zones"
+
+Time.zone = ActiveSupport::TimeZone['UTC']
 
 Dir['spec/support/**/*.rb'].each do |support_path|
   require File.expand_path(support_path)

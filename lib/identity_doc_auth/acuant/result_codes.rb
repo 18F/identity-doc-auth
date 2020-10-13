@@ -1,3 +1,5 @@
+require 'active_support/core_ext/enumerable'
+
 module IdentityDocAuth
   module Acuant
     module ResultCodes
