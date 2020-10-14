@@ -3,8 +3,11 @@ require 'spec_helper'
 RSpec.describe IdentityDocAuth::Acuant::Requests::UploadImageRequest do
   let(:instance_id) { '123abc' }
   let(:url) do
-    URI.join(Figaro.env.acuant_assure_id_url, "/AssureIDService/Document/#{instance_id}/Image")
+    URI.join(assure_id_url, "/AssureIDService/Document/#{instance_id}/Image")
   end
+
+  let(:assure_id_url) { 'https://acuant.assureid.example.com' }
+  let(:config) { IdentityDocAuth::Acuant::Config.new(assure_id_url: assure_id_url) }
 
   context 'with a front image' do
     it 'uploads the image and returns a successful result' do
@@ -14,6 +17,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::UploadImageRequest do
       ).to_return(body: '', status: 201)
 
       request = described_class.new(
+        config: config,
         image_data: DocAuthImageFixtures.document_front_image,
         instance_id: instance_id,
         side: :front,
@@ -35,6 +39,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::UploadImageRequest do
       ).to_return(body: '', status: 201)
 
       request = described_class.new(
+        config: config,
         image_data: DocAuthImageFixtures.document_back_image,
         instance_id: instance_id,
         side: :back,

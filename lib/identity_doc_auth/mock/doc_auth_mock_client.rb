@@ -5,6 +5,8 @@ require 'identity_doc_auth/mock/responses/create_document_response'
 module IdentityDocAuth
   module Mock
     class DocAuthMockClient
+      attr_reader :config
+
       class << self
         attr_reader :response_mocks
         attr_accessor :last_uploaded_front_image

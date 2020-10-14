@@ -2,8 +2,11 @@ require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Acuant::Requests::FacialMatchRequest do
   describe '#fetch' do
+    let(:facial_match_url) { 'https://acuant.facial.match.example.com' }
+    let(:assure_id_subscription_id) { '1234567' }
+
     let(:url) do
-      URI.join(Figaro.env.acuant_facial_match_url, '/api/v1/facematch')
+      URI.join(facial_match_url, '/api/v1/facematch')
     end
     let(:request_body) do
       {
@@ -12,9 +15,16 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::FacialMatchRequest do
           'ImageTwo': Base64.strict_encode64(DocAuthImageFixtures.document_face_image),
         },
         'Settings': {
-          'SubscriptionId': Figaro.env.acuant_assure_id_subscription_id,
+          'SubscriptionId': assure_id_subscription_id,
         },
       }.to_json
+    end
+
+    let(:config) do
+      IdentityDocAuth::Acuant::Config.new(
+        facial_match_url: facial_match_url,
+        assure_id_subscription_id: assure_id_subscription_id,
+      )
     end
 
     context 'when the request is successful' do
@@ -26,6 +36,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::FacialMatchRequest do
                        to_return(body: response_body)
 
         response = described_class.new(
+          config: config,
           selfie_image: DocAuthImageFixtures.selfie_image,
           document_face_image: DocAuthImageFixtures.document_face_image,
         ).fetch
@@ -46,6 +57,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::FacialMatchRequest do
                        to_return(body: response_body)
 
         response = described_class.new(
+          config: config,
           selfie_image: DocAuthImageFixtures.selfie_image,
           document_face_image: DocAuthImageFixtures.document_face_image,
         ).fetch

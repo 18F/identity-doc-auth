@@ -1,7 +1,28 @@
 require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
-  subject(:response) { described_class.new(http_response) }
+  let(:i18n) do
+    FakeI18n.new(
+      'friendly_errors.doc_auth.document_type_could_not_be_determined',
+      'errors.doc_auth.general_error' => 'The document type could not be determined',
+    )
+  end
+
+  let(:config) do
+    IdentityDocAuth::Acuant::Config.new(
+      friendly_error_find_key: proc do |message|
+        {
+          'The 2D barcode could not be read' => 'barcode_could_not_be_read',
+          'The document type could not be determined' => 'document_type_could_not_be_determined',
+          'The birth date is valid' => nil,
+          'The birth dates do not match' => 'birth_dates_do_not_match',
+        }.fetch(message)
+      end,
+      friendly_error_message: proc { |key| key },
+      i18n: i18n,
+    )
+  end
+  subject(:response) { described_class.new(http_response, config) }
 
   context 'with a successful result' do
     let(:http_response) do
@@ -89,13 +110,11 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
     end
     let(:raw_alerts) { JSON.parse(AcuantFixtures.get_results_response_success)['Alerts'] }
 
-    subject(:response) { described_class.new(http_response) }
-
     it 'returns an unsuccessful response with errors' do
       expect(response.success?).to eq(false)
       expect(response.errors).to eq(
         # This is the error message for the error in the response fixture
-        results: [I18n.t('friendly_errors.doc_auth.document_type_could_not_be_determined')],
+        results: ['The document type could not be determined'],
       )
       expect(response.exception).to be_nil
       expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
@@ -116,7 +135,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
           # This is the error message for the error in the response fixture
-          results: [I18n.t('errors.doc_auth.general_error')],
+          results: ['The document type could not be determined'],
         )
         expect(response.exception).to be_nil
       end
@@ -137,7 +156,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
           # This is the error message for the error in the response fixture
-          results: [I18n.t('errors.doc_auth.general_error')],
+          results: ['The document type could not be determined'],
         )
         expect(response.exception).to be_nil
       end
@@ -161,7 +180,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
           # This is the error message for the error in the response fixture
-          results: [I18n.t('friendly_errors.doc_auth.document_type_could_not_be_determined')],
+          results: ['The document type could not be determined'],
         )
         expect(response.exception).to be_nil
       end

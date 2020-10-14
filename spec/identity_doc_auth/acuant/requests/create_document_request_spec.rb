@@ -2,7 +2,10 @@ require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
   describe '#fetch' do
-    let(:url) { URI.join(Figaro.env.acuant_assure_id_url, '/AssureIDService/Document/Instance') }
+    let(:assure_id_url) { 'https://acuant.assureid.example.com' }
+    let(:assure_id_subscription_id) { '1234567' }
+
+    let(:url) { URI.join(assure_id_url, '/AssureIDService/Document/Instance') }
     let(:request_body) do
       {
         AuthenticationSensitivity: 0,
@@ -21,11 +24,18 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
         ImageCroppingMode: '1',
         ManualDocumentType: nil,
         ProcessMode: 0,
-        SubscriptionId: Figaro.env.acuant_assure_id_subscription_id,
+        SubscriptionId: assure_id_subscription_id,
       }.to_json
     end
     let(:response_body) do
       AcuantFixtures.create_document_response
+    end
+
+    let(:config) do
+      IdentityDocAuth::Acuant::Config.new(
+        assure_id_url: assure_id_url,
+        assure_id_subscription_id: assure_id_subscription_id,
+      )
     end
 
     it 'sends a well formed request and returns a response with the instance ID' do
@@ -35,7 +45,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
         body: response_body,
       )
 
-      response = described_class.new.fetch
+      response = described_class.new(config: config).fetch
 
       expect(response.success?).to eq(true)
       expect(response.errors).to eq({})

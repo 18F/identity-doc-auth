@@ -14,6 +14,7 @@ module IdentityDocAuth
       :friendly_error_message,
       :friendly_error_find_key,
       :timeout,
+      :i18n,
       :exception_notifier,
       keyword_init: true,
     )

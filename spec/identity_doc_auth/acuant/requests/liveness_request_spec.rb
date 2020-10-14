@@ -3,16 +3,30 @@ require 'spec_helper'
 RSpec.describe IdentityDocAuth::Acuant::Requests::LivenessRequest do
   describe '#fetch' do
     let(:url) do
-      URI.join(Figaro.env.acuant_passlive_url, '/api/v1/liveness')
+      URI.join(passlive_url, '/api/v1/liveness')
     end
     let(:request_body) do
       {
         'Settings' => {
-          'SubscriptionId' => Figaro.env.acuant_assure_id_subscription_id,
+          'SubscriptionId' => assure_id_subscription_id,
           'AdditionalSettings' => { 'OS' => 'UNKNOWN' },
         },
         'Image' => Base64.strict_encode64(DocAuthImageFixtures.selfie_image),
       }.to_json
+    end
+
+    let(:passlive_url) { 'https://acuant.passlive.example.com' }
+    let(:assure_id_subscription_id) { '1234567' }
+
+    let(:config) do
+      IdentityDocAuth::Acuant::Config.new(
+        passlive_url: passlive_url,
+        assure_id_subscription_id: assure_id_subscription_id,
+      )
+    end
+
+    subject(:request) do
+      described_class.new(config: config, image: DocAuthImageFixtures.selfie_image)
     end
 
     context 'when the request is successful' do
@@ -23,7 +37,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::LivenessRequest do
                        with(body: request_body).
                        to_return(body: response_body)
 
-        response = described_class.new(image: DocAuthImageFixtures.selfie_image).fetch
+        response = request.fetch
 
         expect(response.success?).to eq(true)
         expect(response.errors).to eq({})
@@ -40,7 +54,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::LivenessRequest do
                        with(body: request_body).
                        to_return(body: response_body)
 
-        response = described_class.new(image: DocAuthImageFixtures.selfie_image).fetch
+        response = request.fetch
 
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(selfie: I18n.t('errors.doc_auth.selfie'))

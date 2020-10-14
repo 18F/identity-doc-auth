@@ -66,7 +66,7 @@ module IdentityDocAuth
             # to us. In that case we respond with a general error.
             alert_message = alert['Disposition']
             friendly_message = config.friendly_error_message.call(alert_message, 'doc_auth')
-            next I18n.t('errors.doc_auth.general_error') if friendly_message == alert_message
+            next config.i18n.t('errors.doc_auth.general_error') if friendly_message == alert_message
             friendly_message
           end
 

@@ -1,12 +1,16 @@
 require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Acuant::Request do
+  let(:assure_id_url) { 'https://acuant.assureid.example.com' }
+  let(:assure_id_username) { 'acuant.username' }
+  let(:assure_id_password) { 'acuant.password' }
+
   let(:path) { '/test/path' }
-  let(:full_url) { URI.join(Figaro.env.acuant_assure_id_url, path) }
+  let(:full_url) { URI.join(assure_id_url, path) }
   let(:request_body) { 'test request body' }
   let(:request_headers) do
-    username = Figaro.env.acuant_assure_id_username
-    password = Figaro.env.acuant_assure_id_password
+    username = assure_id_username
+    password = assure_id_password
     {
       'Authorization' => [
         'Basic',
@@ -17,8 +21,19 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
   end
   let(:request_method) { :get }
 
+  let(:exception_notifier) { instance_double('Proc') }
+
+  let(:config) do
+    IdentityDocAuth::Acuant::Config.new(
+      assure_id_url: assure_id_url,
+      assure_id_username: assure_id_username,
+      assure_id_password: assure_id_password,
+      exception_notifier: exception_notifier,
+    )
+  end
+
   subject do
-    request = described_class.new
+    request = described_class.new(config: config)
     allow(request).to receive(:path).and_return(path)
     allow(request).to receive(:body).and_return(request_body)
     allow(request).to receive(:method).and_return(request_method)
@@ -65,19 +80,20 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
         stub_request(:get, full_url).
           with(headers: request_headers).
           to_return(body: 'test response body', status: 404)
+        allow(exception_notifier).to receive(:call)
 
         response = subject.fetch
 
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(network: I18n.t('errors.doc_auth.acuant_network_error'))
         expect(response.exception.message).to eq(
-          'DocAuth::Acuant::Request Unexpected HTTP response 404',
+          'IdentityDocAuth::Acuant::Request Unexpected HTTP response 404',
         )
       end
     end
 
     context 'when the request resolves with retriable error then succeeds it only retries once' do
-      it 'calls New Relic notice_error each retry' do
+      it 'calls exception_notifier each retry' do
         allow(subject).to receive(:handle_http_response) do |http_response|
           http_response
         end
@@ -89,8 +105,8 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
             { body: 'test response body', status: 200 },
           )
 
-        expect(NewRelic::Agent).to receive(:notice_error).
-          with(anything, hash_including(:custom_params)).once
+        expect(exception_notifier).to receive(:call).
+          with(anything, hash_including(:retry)).once
 
         response = subject.fetch
 
@@ -99,7 +115,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
     end
 
     context 'when the request resolves with a 404 status it retries' do
-      it 'calls New Relic notice_error each retry' do
+      it 'calls exception_notifier each retry' do
         allow(subject).to receive(:handle_http_response) do |http_response|
           http_response
         end
@@ -111,11 +127,11 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
             { body: 'test response body', status: 404 },
           )
 
-        expect(NewRelic::Agent).to receive(:notice_error).
+        expect(exception_notifier).to receive(:call).
           with(RuntimeError).once
 
-        expect(NewRelic::Agent).to receive(:notice_error).
-          with(anything, hash_including(:custom_params)).twice
+        expect(exception_notifier).to receive(:call).
+          with(anything, hash_including(:retry)).twice
 
         response = subject.fetch
 
@@ -124,7 +140,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
     end
 
     context 'when the request resolves with a 438 status it retries' do
-      it 'calls New Relic notice_error each retry' do
+      it 'calls exception_notifier each retry' do
         allow(subject).to receive(:handle_http_response) do |http_response|
           http_response
         end
@@ -136,11 +152,11 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
             { body: 'test response body', status: 438 },
           )
 
-        expect(NewRelic::Agent).to receive(:notice_error).
+        expect(exception_notifier).to receive(:call).
           with(RuntimeError).once
 
-        expect(NewRelic::Agent).to receive(:notice_error).
-          with(anything, hash_including(:custom_params)).twice
+        expect(exception_notifier).to receive(:call).
+          with(anything, hash_including(:retry)).twice
 
         response = subject.fetch
 
@@ -149,7 +165,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
     end
 
     context 'when the request resolves with a 438 status it retries' do
-      it 'calls New Relic notice_error each retry' do
+      it 'calls exception_notifier each retry' do
         allow(subject).to receive(:handle_http_response) do |http_response|
           http_response
         end
@@ -161,11 +177,11 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
             { body: 'test response body', status: 439 },
           )
 
-        expect(NewRelic::Agent).to receive(:notice_error).
+        expect(exception_notifier).to receive(:call).
           with(RuntimeError).once
 
-        expect(NewRelic::Agent).to receive(:notice_error).
-          with(anything, hash_including(:custom_params)).twice
+        expect(exception_notifier).to receive(:call).
+          with(anything, hash_including(:retry)).twice
 
         response = subject.fetch
 
@@ -177,7 +193,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
       it 'returns a response with a timeout message and exception and notifies NewRelic' do
         stub_request(:get, full_url).to_timeout
 
-        expect(NewRelic::Agent).to receive(:notice_error)
+        expect(exception_notifier).to receive(:call)
 
         response = subject.fetch
 

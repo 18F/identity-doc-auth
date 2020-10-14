@@ -4,14 +4,17 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::GetResultsRequest do
   describe '#fetch' do
     let(:instance_id) { '123abc' }
     let(:url) do
-      URI.join(Figaro.env.acuant_assure_id_url, "/AssureIDService/Document/#{instance_id}")
+      URI.join(assure_id_url, "/AssureIDService/Document/#{instance_id}")
     end
     let(:response_body) { AcuantFixtures.get_results_response_success }
+
+    let(:assure_id_url) { 'https://acuant.assureid.example.com' }
+    let(:config) { IdentityDocAuth::Acuant::Config.new(assure_id_url: assure_id_url) }
 
     it 'sends a request and return the response' do
       request_stub = stub_request(:get, url).to_return(body: response_body)
 
-      response = described_class.new(instance_id: instance_id).fetch
+      response = described_class.new(config: config, instance_id: instance_id).fetch
 
       expect(response.success?).to eq(true)
       expect(response.errors).to eq({})
