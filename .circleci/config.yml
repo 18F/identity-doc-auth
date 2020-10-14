@@ -8,8 +8,6 @@ jobs:
     docker:
       # Specify the Ruby version you desire here
       - image: circleci/ruby:2.6.0
-        environment:
-          BUNDLER_VERSION: 2.1.4
 
     steps:
       - checkout
