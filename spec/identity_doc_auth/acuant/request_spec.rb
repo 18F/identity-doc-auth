@@ -85,7 +85,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
         response = subject.fetch
 
         expect(response.success?).to eq(false)
-        expect(response.errors).to eq(network: I18n.t('errors.doc_auth.acuant_network_error'))
+        expect(response.errors).to eq(network: true)
         expect(response.exception.message).to eq(
           'IdentityDocAuth::Acuant::Request Unexpected HTTP response 404',
         )
@@ -198,7 +198,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
         response = subject.fetch
 
         expect(response.success?).to eq(false)
-        expect(response.errors).to eq(network: I18n.t('errors.doc_auth.acuant_network_error'))
+        expect(response.errors).to eq(network: true)
         expect(response.exception).to be_a(Faraday::ConnectionFailed)
       end
     end

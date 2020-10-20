@@ -34,11 +34,11 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::LivenessResponse do
       response = described_class.new(http_response)
 
       expect(response.success?).to eq(false)
-      expect(response.errors).to eq(selfie: I18n.t('errors.doc_auth.selfie'))
+      expect(response.errors).to eq(selfie: true)
       expect(response.exception).to be_nil
       expect(response.to_h).to eq(
         success: false,
-        errors: { selfie: I18n.t('errors.doc_auth.selfie') },
+        errors: { selfie: true },
         exception: nil,
         liveness_assessment: nil,
         liveness_score: nil,

@@ -1,26 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
-  let(:i18n) do
-    FakeI18n.new(
-      'friendly_errors.doc_auth.document_type_could_not_be_determined',
-      'errors.doc_auth.general_error' => 'The document type could not be determined',
-    )
-  end
-
   let(:config) do
-    IdentityDocAuth::Acuant::Config.new(
-      friendly_error_find_key: proc do |message|
-        {
-          'The 2D barcode could not be read' => 'barcode_could_not_be_read',
-          'The document type could not be determined' => 'document_type_could_not_be_determined',
-          'The birth date is valid' => nil,
-          'The birth dates do not match' => 'birth_dates_do_not_match',
-        }.fetch(message)
-      end,
-      friendly_error_message: proc { |key| key },
-      i18n: i18n,
-    )
+    IdentityDocAuth::Acuant::Config.new
   end
   subject(:response) { described_class.new(http_response, config) }
 
@@ -121,21 +103,20 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
       expect(response.result_code.billed?).to eq(false)
     end
 
-    context 'when a friendly error does not exist for the acuant error message' do
+    context 'when with an acuant error message' do
       let(:http_response) do
         parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
-        parsed_response_body['Alerts'].first['Disposition'] = 'This message does not have key'
+        parsed_response_body['Alerts'].first['Disposition'] = 'This message does not have a key'
         instance_double(
           Faraday::Response,
           body: parsed_response_body.to_json,
         )
       end
 
-      it 'returns the general error' do
+      it 'returns the untranslated error' do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
-          # This is the error message for the error in the response fixture
-          results: ['The document type could not be determined'],
+          results: ['This message does not have a key'],
         )
         expect(response.exception).to be_nil
       end
@@ -144,7 +125,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
     context 'when multiple alerts have the same friendly error' do
       let(:http_response) do
         parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
-        parsed_response_body['Alerts'].first['Disposition'] = 'This message does not have key'
+        parsed_response_body['Alerts'].first['Disposition'] = 'This message does not have a key'
         parsed_response_body['Alerts'][1] = parsed_response_body['Alerts'].first
         instance_double(
           Faraday::Response,
@@ -152,11 +133,10 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
         )
       end
 
-      it 'only returns one copy of the friendly error' do
+      it 'only returns one copy of the each error' do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
-          # This is the error message for the error in the response fixture
-          results: ['The document type could not be determined'],
+          results: ['This message does not have a key'],
         )
         expect(response.exception).to be_nil
       end

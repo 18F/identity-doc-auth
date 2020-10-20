@@ -10,8 +10,6 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
       assure_id_url: assure_id_url,
       facial_match_url: facial_match_url,
       passlive_url: passlive_url,
-      friendly_error_message: proc { 'error' },
-      friendly_error_find_key: proc { 'key' },
     )
   end
 
@@ -185,7 +183,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
       result = subject.create_document
 
       expect(result.success?).to eq(false)
-      expect(result.errors).to eq(network: I18n.t('errors.doc_auth.acuant_network_error'))
+      expect(result.errors).to eq(network: true)
       expect(result.exception.message).to eq(
         'IdentityDocAuth::Acuant::Requests::CreateDocumentRequest Unexpected HTTP response 500',
       )
@@ -200,7 +198,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
       result = subject.create_document
 
       expect(result.success?).to eq(false)
-      expect(result.errors).to eq(network: I18n.t('errors.doc_auth.acuant_network_error'))
+      expect(result.errors).to eq(network: true)
       expect(result.exception.message).to eq(
         'Connection failed',
       )
@@ -251,7 +249,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
         )
 
         expect(result.success?).to eq(false)
-        expect(result.errors).to eq(network: I18n.t('errors.doc_auth.acuant_network_error'))
+        expect(result.errors).to eq(network: true)
       end
     end
 
@@ -269,7 +267,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
         )
 
         expect(result.success?).to eq(false)
-        expect(result.errors).to eq(selfie: I18n.t('errors.doc_auth.selfie'))
+        expect(result.errors).to eq(selfie: true)
       end
     end
 
@@ -287,7 +285,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
         )
 
         expect(result.success?).to eq(false)
-        expect(result.errors).to eq(selfie: I18n.t('errors.doc_auth.selfie'))
+        expect(result.errors).to eq(selfie: true)
       end
     end
   end

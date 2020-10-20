@@ -8,6 +8,8 @@ module IdentityDocAuth
       class GetResultsResponse < IdentityDocAuth::Response
         attr_reader :config
 
+        BARCODE_COULD_NOT_BE_READ_ERROR = 'The 2D barcode could not be read'.freeze
+
         def initialize(http_response, config)
           @http_response = http_response
           @config = config
@@ -60,17 +62,9 @@ module IdentityDocAuth
             alert_result_code != IdentityDocAuth::Acuant::ResultCodes::PASSED
           end
 
-          messages = unsuccessful_alerts.map do |alert|
-            # If a friendly message exists for this alert, we want to return that.
-            # If a friendly message does not exist, FriendlyError::Message will return the raw alert
-            # to us. In that case we respond with a general error.
-            alert_message = alert['Disposition']
-            friendly_message = config.friendly_error_message.call(alert_message, 'doc_auth')
-            next config.i18n.t('errors.doc_auth.general_error') if friendly_message == alert_message
-            friendly_message
-          end
-
-          { results: messages.uniq }
+          {
+            results: unsuccessful_alerts.map { |alert| alert['Disposition'] }.uniq,
+          }
         end
 
         def parsed_response_body
@@ -93,12 +87,11 @@ module IdentityDocAuth
           return false unless result_code == IdentityDocAuth::Acuant::ResultCodes::ATTENTION
 
           raw_alerts.all? do |alert|
-            error_key = config.friendly_error_find_key.call(alert['Disposition'], 'doc_auth')
             alert_result_code = IdentityDocAuth::Acuant::ResultCodes.from_int(alert['Result'])
 
             alert_result_code == IdentityDocAuth::Acuant::ResultCodes::PASSED ||
               (alert_result_code == IdentityDocAuth::Acuant::ResultCodes::ATTENTION &&
-               error_key == 'barcode_could_not_be_read')
+               alert['Disposition'] == BARCODE_COULD_NOT_BE_READ_ERROR)
           end
         end
       end

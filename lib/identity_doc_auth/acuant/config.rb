@@ -11,10 +11,7 @@ module IdentityDocAuth
       :assure_id_username,
       :facial_match_url,
       :passlive_url,
-      :friendly_error_message,
-      :friendly_error_find_key,
       :timeout,
-      :i18n,
       :exception_notifier,
       keyword_init: true,
     )

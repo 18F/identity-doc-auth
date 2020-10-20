@@ -57,7 +57,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::LivenessRequest do
         response = request.fetch
 
         expect(response.success?).to eq(false)
-        expect(response.errors).to eq(selfie: I18n.t('errors.doc_auth.selfie'))
+        expect(response.errors).to eq(selfie: true)
         expect(response.exception).to be_nil
         expect(request_stub).to have_been_requested
       end

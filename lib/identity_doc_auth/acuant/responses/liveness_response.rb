@@ -25,7 +25,7 @@ module IdentityDocAuth
         def error_messages
           return {} if successful_result?
           {
-            selfie: I18n.t('errors.doc_auth.selfie'),
+            selfie: true,
           }
         end
 

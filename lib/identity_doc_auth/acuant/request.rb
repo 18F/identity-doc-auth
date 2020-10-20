@@ -100,7 +100,7 @@ module IdentityDocAuth
         config.exception_notifier&.call(exception)
         IdentityDocAuth::Response.new(
           success: false,
-          errors: { network: I18n.t('errors.doc_auth.acuant_network_error') },
+          errors: { network: true },
           exception: exception,
         )
       end
@@ -109,7 +109,7 @@ module IdentityDocAuth
         config.exception_notifier&.call(exception)
         IdentityDocAuth::Response.new(
           success: false,
-          errors: { network: I18n.t('errors.doc_auth.acuant_network_error') },
+          errors: { network: true },
           exception: exception,
         )
       end
