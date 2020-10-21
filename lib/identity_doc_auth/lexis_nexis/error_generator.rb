@@ -68,12 +68,13 @@ module IdentityDocAuth
       def generate_trueid_errors(response_info, liveness_enabled)
         user_error_count = response_info[:AlertFailureCount]
 
+        unknown_fail_count = scan_for_unknown_alerts(response_info)
+        user_error_count -= unknown_fail_count
+
         errors = get_error_messages(liveness_enabled, response_info)
         user_error_count += 1 if errors.include?(SELFIE)
 
-        scan_for_unknown_alerts(response_info)
-
-        if user_error_count.zero?
+        if user_error_count < 1
           e = UnknownTrueIDError.new('LN TrueID failure escaped without useful errors')
           config.exception_notifier&.call(e, response_info: response_info)
 
@@ -136,17 +137,26 @@ module IdentityDocAuth
 
       def scan_for_unknown_alerts(response_info)
         all_alerts = [*response_info[:Alerts][:failed], *response_info[:Alerts][:passed]]
+        unknown_fail_count = 0
 
         unknown_alerts = []
         all_alerts.each do |alert|
-          unknown_alerts.push(alert[:name]) if TRUE_ID_MESSAGES[alert[:name].to_sym].blank?
+          if TRUE_ID_MESSAGES[alert[:name].to_sym].blank?
+            unknown_alerts.push(alert[:name])
+
+            if alert[:result] != 'Passed'
+              unknown_fail_count += 1
+            end
+          end
         end
 
-        return if unknown_alerts.empty?
+        return 0 if unknown_alerts.empty?
 
         message = 'LN TrueID responded with alert name(s) we do not handle: ' + unknown_alerts.to_s
         e = UnknownTrueIDAlert.new(message)
         config.exception_notifier&.call(e, response_info: response_info)
+
+        unknown_fail_count
       end
     end
   end

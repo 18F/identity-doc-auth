@@ -7,8 +7,16 @@ module LexisNexisFixtures
     load_response_fixture('true_id_response_success_2.json')
   end
 
-  def self.true_id_response_failure
+  def self.true_id_response_failure_no_liveness
     load_response_fixture('true_id_response_failure_no_liveness.json')
+  end
+
+  def self.true_id_response_failure_with_liveness
+    load_response_fixture('true_id_response_failure_with_liveness.json')
+  end
+
+  def self.true_id_response_failure_with_all_failures
+    load_response_fixture('true_id_response_failure_with_all_failures.json')
   end
 
   def self.load_response_fixture(filename)
