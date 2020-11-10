@@ -10,7 +10,6 @@ RSpec.describe IdentityDocAuth::LexisNexis::Request do
   let(:config) do
     IdentityDocAuth::LexisNexis::Config.new(
       base_url: base_url,
-      i18n: FakeI18n.new('doc_auth.errors.lexis_nexis.network_error'),
     )
   end
   subject(:request) { IdentityDocAuth::LexisNexis::Request.new(config: config) }

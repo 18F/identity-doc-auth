@@ -48,7 +48,7 @@ module IdentityDocAuth
         config.exception_notifier&.call(exception)
         IdentityDocAuth::Response.new(
           success: false,
-          errors: { network: config.i18n.t('doc_auth.errors.lexis_nexis.network_error') },
+          errors: { network: true },
           exception: exception,
         )
       end
