@@ -4,7 +4,6 @@ module IdentityDocAuth
       BARCODE_CONTENT_CHECK = 'barcode_content_check'
       BARCODE_READ_CHECK = 'barcode_read_check'
       BIRTH_DATE_CHECKS = 'birth_date_checks'
-      BIRTH_DATE_CHECKS = 'birth_date_checks'
       CONTROL_NUMBER_CHECK = 'control_number_check'
       DOC_CROSSCHECK = 'doc_crosscheck'
       DOC_NUMBER_CHECKS = 'doc_number_checks'
