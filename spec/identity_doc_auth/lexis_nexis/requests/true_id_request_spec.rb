@@ -8,7 +8,6 @@ RSpec.describe IdentityDocAuth::LexisNexis::Requests::TrueIdRequest do
   let(:full_url) { base_url + path }
   let(:config) do
     IdentityDocAuth::LexisNexis::Config.new(
-      i18n: FakeI18n.new,
       trueid_account_id: account_id,
       base_url: base_url,
       trueid_liveness_workflow: 'test_workflow',

@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+require 'identity_doc_auth/lexis_nexis/errors'
+
 module IdentityDocAuth
   module LexisNexis
     class UnknownTrueIDError < StandardError; end
@@ -17,52 +20,37 @@ module IdentityDocAuth
       SELFIE = :selfie
       GENERAL = :general
 
-      # rubocop:disable Layout/LineLength
+      ERROR_KEYS = [
+        ID,
+        FRONT,
+        BACK,
+        SELFIE,
+        GENERAL,
+      ].to_set.freeze
+
       TRUE_ID_MESSAGES = {
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.ref_control_number_check')
-        '1D Control Number Valid': { type: BACK, msg_key: 'doc_auth.errors.lexis_nexis.ref_control_number_check' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.barcode_content_check')
-        '2D Barcode Content': { type: BACK, msg_key: 'doc_auth.errors.lexis_nexis.barcode_content_check' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.barcode_read_check')
-        '2D Barcode Read': { type: BACK, msg_key: 'doc_auth.errors.lexis_nexis.barcode_read_check' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.birth_date_checks')
-        'Birth Date Crosscheck': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.birth_date_checks' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.birth_date_checks')
-        'Birth Date Valid': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.birth_date_checks' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.control_number_check')
-        'Control Number Crosscheck': { type: BACK, msg_key: 'doc_auth.errors.lexis_nexis.control_number_check' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.id_not_recognized')
-        'Document Classification': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.id_not_recognized' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.doc_crosscheck')
-        'Document Crosscheck Aggregation': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.doc_crosscheck' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.expiration_checks')
-        'Document Expired': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.expiration_checks' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.doc_number_checks')
-        'Document Number Crosscheck': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.doc_number_checks' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.expiration_checks')
-        'Expiration Date Crosscheck': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.expiration_checks' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.expiration_checks')
-        'Expiration Date Valid': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.expiration_checks' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.full_name_check')
-        'Full Name Crosscheck': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.full_name_check' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.issue_date_checks')
-        'Issue Date Crosscheck': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.issue_date_checks' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.issue_date_checks')
-        'Issue Date Valid': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.issue_date_checks' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.id_not_verified')
-        'Layout Valid': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.id_not_verified' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.id_not_verified')
-        'Near-Infrared Response': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.id_not_verified' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.sex_check')
-        'Sex Crosscheck': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.sex_check' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.visible_color_check')
-        'Visible Color Response': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.visible_color_check' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.id_not_verified')
-        'Visible Pattern': { type: ID, msg_key: 'doc_auth.errors.lexis_nexis.id_not_verified' },
-        # i18n-tasks-use t('doc_auth.errors.lexis_nexis.visible_photo_check')
-        'Visible Photo Characteristics': { type: FRONT, msg_key: 'doc_auth.errors.lexis_nexis.visible_photo_check' },
+        '1D Control Number Valid': { type: BACK, msg_key: Errors::REF_CONTROL_NUMBER_CHECK },
+        '2D Barcode Content': { type: BACK, msg_key: Errors::BARCODE_CONTENT_CHECK },
+        '2D Barcode Read': { type: BACK, msg_key: Errors::BARCODE_READ_CHECK },
+        'Birth Date Crosscheck': { type: ID, msg_key: Errors::BIRTH_DATE_CHECKS },
+        'Birth Date Valid': { type: ID, msg_key: Errors::BIRTH_DATE_CHECKS },
+        'Control Number Crosscheck': { type: BACK, msg_key: Errors::CONTROL_NUMBER_CHECK },
+        'Document Classification': { type: ID, msg_key: Errors::ID_NOT_RECOGNIZED },
+        'Document Crosscheck Aggregation': { type: ID, msg_key: Errors::DOC_CROSSCHECK },
+        'Document Expired': { type: ID, msg_key: Errors::EXPIRATION_CHECKS },
+        'Document Number Crosscheck': { type: ID, msg_key: Errors::DOC_NUMBER_CHECKS },
+        'Expiration Date Crosscheck': { type: ID, msg_key: Errors::EXPIRATION_CHECKS },
+        'Expiration Date Valid': { type: ID, msg_key: Errors::EXPIRATION_CHECKS },
+        'Full Name Crosscheck': { type: ID, msg_key: Errors::FULL_NAME_CHECK },
+        'Issue Date Crosscheck': { type: ID, msg_key: Errors::ISSUE_DATE_CHECKS },
+        'Issue Date Valid': { type: ID, msg_key: Errors::ISSUE_DATE_CHECKS },
+        'Layout Valid': { type: ID, msg_key: Errors::ID_NOT_VERIFIED },
+        'Near-Infrared Response': { type: ID, msg_key: Errors::ID_NOT_VERIFIED },
+        'Sex Crosscheck': { type: ID, msg_key: Errors::SEX_CHECK },
+        'Visible Color Response': { type: ID, msg_key: Errors::VISIBLE_COLOR_CHECK },
+        'Visible Pattern': { type: ID, msg_key: Errors::ID_NOT_VERIFIED },
+        'Visible Photo Characteristics': { type: FRONT, msg_key: Errors::VISIBLE_PHOTO_CHECK },
       }.freeze
-      # rubocop:enable Layout/LineLength
 
       # rubocop:disable Metrics/PerceivedComplexity
       def generate_trueid_errors(response_info, liveness_enabled)
@@ -88,9 +76,9 @@ module IdentityDocAuth
             when ID
               errors[ID] = Set[general_error(false)]
             when FRONT
-              errors[FRONT] = Set[config.i18n.t('doc_auth.errors.lexis_nexis.multiple_front_id_failures')]
+              errors[FRONT] = Set[Errors::MULTIPLE_FRONT_ID_FAILURES]
             when BACK
-              errors[BACK] = Set[config.i18n.t('doc_auth.errors.lexis_nexis.multiple_back_id_failures')]
+              errors[BACK] = Set[Errors::MULTIPLE_BACK_ID_FAILURES]
             end
           elsif error_fields.length > 1
             return { GENERAL => [general_error(liveness_enabled)] } if error_fields.include?(SELFIE)
@@ -114,14 +102,14 @@ module IdentityDocAuth
             alert_msg_hash = TRUE_ID_MESSAGES[alert[:name].to_sym]
 
             if alert_msg_hash.present?
-              errors[alert_msg_hash[:type]].add(config.i18n.t(alert_msg_hash[:msg_key]))
+              errors[alert_msg_hash[:type]] << alert_msg_hash[:msg_key]
             end
           end
         end
 
         pm_results = response_info[:PortraitMatchResults] || {}
         if liveness_enabled && pm_results.dig(:FaceMatchResult) != 'Pass'
-          errors[SELFIE].add(config.i18n.t('doc_auth.errors.lexis_nexis.selfie_failure'))
+          errors[SELFIE] << Errors::SELFIE_FAILURE
         end
 
         errors
@@ -129,9 +117,9 @@ module IdentityDocAuth
 
       def general_error(liveness_enabled)
         if liveness_enabled
-          config.i18n.t('doc_auth.errors.lexis_nexis.general_error_liveness')
+          Errors::GENERAL_ERROR_LIVENESS
         else
-          config.i18n.t('doc_auth.errors.lexis_nexis.general_error_no_liveness')
+          Errors::GENERAL_ERROR_NO_LIVENESS
         end
       end
 

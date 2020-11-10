@@ -10,23 +10,11 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
     )
   end
 
-  let(:i18n) do
-    FakeI18n.new(
-      'doc_auth.errors.lexis_nexis.id_not_verified',
-      'doc_auth.errors.lexis_nexis.ref_control_number_check',
-      'doc_auth.errors.lexis_nexis.barcode_content_check',
-      'doc_auth.errors.lexis_nexis.control_number_check',
-      'doc_auth.errors.lexis_nexis.expiration_checks',
-      'doc_auth.errors.lexis_nexis.selfie_failure',
-      'doc_auth.errors.lexis_nexis.general_error_liveness',
-    )
-  end
-
   subject(:client) do
     IdentityDocAuth::LexisNexis::LexisNexisClient.new(
       base_url: "https://lexis.nexis.example.com",
+      locale: "en",
       trueid_account_id: "test_account",
-      i18n: i18n,
       trueid_liveness_workflow: 'LIVENESS.WORKFLOW',
       trueid_noliveness_workflow: 'NO.LIVENESS.WORKFLOW',
     )

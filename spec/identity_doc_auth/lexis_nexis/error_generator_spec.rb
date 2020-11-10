@@ -4,25 +4,8 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
   let(:exception_notifier) { instance_double('Proc') }
 
-  let(:i18n) do
-    FakeI18n.new(
-      'doc_auth.errors.lexis_nexis.barcode_content_check',
-      'doc_auth.errors.lexis_nexis.barcode_read_check',
-      'doc_auth.errors.lexis_nexis.birth_date_checks',
-      'doc_auth.errors.lexis_nexis.control_number_check',
-      'doc_auth.errors.lexis_nexis.expiration_checks',
-      'doc_auth.errors.lexis_nexis.full_name_check',
-      'doc_auth.errors.lexis_nexis.general_error_no_liveness',
-      'doc_auth.errors.lexis_nexis.general_error_liveness',
-      'doc_auth.errors.lexis_nexis.id_not_verified',
-      'doc_auth.errors.lexis_nexis.multiple_back_id_failures',
-      'doc_auth.errors.lexis_nexis.ref_control_number_check',
-      'doc_auth.errors.lexis_nexis.selfie_failure',
-      )
-  end
   let(:config) do
     IdentityDocAuth::LexisNexis::Config.new(
-      i18n: i18n,
       exception_notifier: exception_notifier,
     )
   end
@@ -56,7 +39,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:back)
       expect(output[:back]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.barcode_read_check')
+        IdentityDocAuth::LexisNexis::Errors::BARCODE_READ_CHECK,
       )
     end
 
@@ -70,7 +53,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:id)
       expect(output[:id]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.id_not_verified')
+        IdentityDocAuth::LexisNexis::Errors::ID_NOT_VERIFIED,
       )
     end
 
@@ -87,7 +70,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:general)
       expect(output[:general]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.general_error_no_liveness')
+        IdentityDocAuth::LexisNexis::Errors::GENERAL_ERROR_NO_LIVENESS,
       )
     end
 
@@ -104,7 +87,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:id)
       expect(output[:id]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.general_error_no_liveness')
+        IdentityDocAuth::LexisNexis::Errors::GENERAL_ERROR_NO_LIVENESS,
       )
     end
 
@@ -121,7 +104,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:back)
       expect(output[:back]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.multiple_back_id_failures')
+        IdentityDocAuth::LexisNexis::Errors::MULTIPLE_BACK_ID_FAILURES,
       )
     end
 
@@ -138,7 +121,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:general)
       expect(output[:general]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.general_error_no_liveness')
+        IdentityDocAuth::LexisNexis::Errors::GENERAL_ERROR_NO_LIVENESS,
       )
     end
 
@@ -158,7 +141,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:id)
       expect(output[:id]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.birth_date_checks')
+        IdentityDocAuth::LexisNexis::Errors::BIRTH_DATE_CHECKS,
       )
     end
 
@@ -176,7 +159,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:id)
       expect(output[:id]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.birth_date_checks')
+        IdentityDocAuth::LexisNexis::Errors::BIRTH_DATE_CHECKS,
       )
     end
   end
@@ -193,7 +176,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:back)
       expect(output[:back]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.barcode_read_check')
+        IdentityDocAuth::LexisNexis::Errors::BARCODE_READ_CHECK,
       )
     end
 
@@ -208,7 +191,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:general)
       expect(output[:general]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.general_error_liveness')
+        IdentityDocAuth::LexisNexis::Errors::GENERAL_ERROR_LIVENESS,
       )
     end
 
@@ -223,7 +206,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:back)
       expect(output[:back]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.barcode_read_check')
+        IdentityDocAuth::LexisNexis::Errors::BARCODE_READ_CHECK,
       )
     end
 
@@ -234,7 +217,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::ErrorGenerator do
 
       expect(output.keys).to contain_exactly(:selfie)
       expect(output[:selfie]).to contain_exactly(
-        i18n.t('doc_auth.errors.lexis_nexis.selfie_failure')
+        IdentityDocAuth::LexisNexis::Errors::SELFIE_FAILURE,
       )
     end
   end

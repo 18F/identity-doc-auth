@@ -4,8 +4,6 @@ module IdentityDocAuth
     #   @return [Proc] should be a proc that accepts an Exception and an optional context hash
     #   @example
     #      config.exception_notifier.call(RuntimeError.new("oh no"), attempt_count: 1)
-    # @!attribute [rw] i18n
-    #   @return [I18n] should be the I18n singleton from the calling application
     Config = Struct.new(
       :account_id,
       :base_url, # required
@@ -17,13 +15,12 @@ module IdentityDocAuth
       :trueid_username,
       :timeout, # optional
       :exception_notifier, # optional
-      :i18n, # required
       :locale, # required
       keyword_init: true,
     ) do
       def validate!
         raise 'config missing base_url' if !base_url
-        raise 'config missing i18n' if !i18n
+        raise 'config missing locale' if !locale
       end
     end
   end
