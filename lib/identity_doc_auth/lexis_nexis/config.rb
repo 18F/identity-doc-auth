@@ -18,6 +18,7 @@ module IdentityDocAuth
       :timeout, # optional
       :exception_notifier, # optional
       :i18n, # required
+      :locale, # required
       keyword_init: true,
     ) do
       def validate!

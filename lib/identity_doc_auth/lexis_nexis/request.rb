@@ -111,7 +111,7 @@ module IdentityDocAuth
           Type: 'Initiate',
           Settings: {
             Mode: request_mode,
-            Locale: config.i18n.locale,
+            Locale: config.locale,
             Venue: 'online',
             Reference: uuid,
           },
