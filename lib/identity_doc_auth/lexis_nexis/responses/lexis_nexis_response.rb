@@ -89,10 +89,10 @@ module IdentityDocAuth
 
         def products
           @products ||=
-            parsed_response_body.dig(:Products).each_with_object({}) do |product, product_list|
+            parsed_response_body.dig(:Products)&.each_with_object({}) do |product, product_list|
               extract_details(product)
               product_list[product[:ProductType]] = product
-            end.with_indifferent_access
+            end&.with_indifferent_access
         end
 
         def extract_details(product)

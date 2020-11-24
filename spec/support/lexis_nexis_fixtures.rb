@@ -19,6 +19,14 @@ module LexisNexisFixtures
     load_response_fixture('true_id_response_failure_with_all_failures.json')
   end
 
+  def self.communications_error
+    load_response_fixture('communications_error.json')
+  end
+
+  def self.internal_application_error
+    load_response_fixture('internal_application_error.json')
+  end
+
   def self.load_response_fixture(filename)
     path = File.join(
       File.dirname(__FILE__),

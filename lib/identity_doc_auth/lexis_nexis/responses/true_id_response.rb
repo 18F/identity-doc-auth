@@ -6,6 +6,7 @@ require 'identity_doc_auth/lexis_nexis/responses/lexis_nexis_response'
 module IdentityDocAuth
   module LexisNexis
     module Responses
+      class LexisNexisResponseError < StandardError; end
       class TrueIdResponse < LexisNexisResponse
         attr_reader :config
 
@@ -18,6 +19,7 @@ module IdentityDocAuth
 
         def successful_result?
           transaction_status_passed? &&
+            true_id_product.present? &&
             product_status_passed? &&
             doc_auth_result_passed?
         end
@@ -25,17 +27,34 @@ module IdentityDocAuth
         def error_messages
           return {} if successful_result?
 
-          ErrorGenerator.new(config).generate_trueid_errors(response_info, @liveness_checking_enabled)
+          if true_id_product.present?
+            ErrorGenerator.new(config).generate_trueid_errors(response_info, @liveness_checking_enabled)
+          else
+            { network: true } # return a generic technical difficulties error to user
+          end
         end
 
         def extra_attributes
-          attrs = response_info.merge(true_id_product[:AUTHENTICATION_RESULT])
-          attrs.reject do |k, _v|
-            PII_DETAILS.include? k
+          if true_id_product.present?
+            attrs = response_info.merge(true_id_product[:AUTHENTICATION_RESULT])
+            attrs.reject do |k, _v|
+              PII_DETAILS.include? k
+            end
+          else
+            response_status = {
+              LN_Status: parsed_response_body[:Status],
+              LN_Info: parsed_response_body.dig(:Information)
+            }
+            e = LexisNexisResponseError.new("Unexpected LN Response: TrueID response not found.")
+
+            config.exception_notifier&.call(e, response_info: response_status)
+            return response_status
           end
         end
 
         def pii_from_doc
+          return {} unless true_id_product.present?
+
           true_id_product[:AUTHENTICATION_RESULT].select do |k, _v|
             PII_DETAILS.include? k
           end
@@ -81,7 +100,7 @@ module IdentityDocAuth
         end
 
         def true_id_product
-          products[:TrueID]
+          products[:TrueID] if products.present?
         end
 
         def parse_alerts
