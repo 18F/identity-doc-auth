@@ -42,8 +42,8 @@ module IdentityDocAuth
             end
           else
             response_status = {
-              LN_Status: parsed_response_body[:Status],
-              LN_Info: parsed_response_body.dig(:Information)
+              lexis_nexis_status: parsed_response_body[:Status],
+              lexis_nexis_info: parsed_response_body.dig(:Information)
             }
             e = LexisNexisResponseError.new("Unexpected LN Response: TrueID response not found.")
 

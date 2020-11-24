@@ -96,7 +96,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
 
       expect(output[:success]).to eq(false)
       expect(output[:errors]).to eq(network: true)
-      expect(output).to include(:LN_Status, :LN_Info)
+      expect(output).to include(:lexis_nexis_status, :lexis_nexis_info)
     end
 
     it 'it produces reasonable output for internal application error' do
@@ -107,7 +107,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
 
       expect(output[:success]).to eq(false)
       expect(output[:errors]).to eq(network: true)
-      expect(output).to include(:LN_Status, :LN_Info)
+      expect(output).to include(:lexis_nexis_status, :lexis_nexis_info)
     end
   end
 end
