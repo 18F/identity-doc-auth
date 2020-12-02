@@ -43,15 +43,14 @@ module IdentityDocAuth
             extra: extra_attributes,
             pii_from_doc: pii_from_doc,
           )
-          rescue StandardError => e
-            config.exception_notifier&.call(e)
-            super(
-              success: false,
-              errors: { network: true },
-              exception: e,
-              extra: { backtrace: e.backtrace },
-            )
-          end
+        rescue StandardError => e
+          config.exception_notifier&.call(e)
+          super(
+            success: false,
+            errors: { network: true },
+            exception: e,
+            extra: { backtrace: e.backtrace },
+          )
         end
 
         def successful_result?
