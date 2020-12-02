@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'active_support/core_ext/object/blank'
 require 'identity_doc_auth/lexis_nexis/error_generator'
 require 'identity_doc_auth/lexis_nexis/responses/lexis_nexis_response'
 
@@ -27,7 +28,7 @@ module IdentityDocAuth
         def error_messages
           return {} if successful_result?
 
-          if true_id_product.present? && true_id_product[:AUTHENTICATION_RESULT].present?
+          if true_id_product&.dig(:AUTHENTICATION_RESULT).present?
             ErrorGenerator.new(config).generate_trueid_errors(response_info, @liveness_checking_enabled)
           else
             { network: true } # return a generic technical difficulties error to user
@@ -53,7 +54,7 @@ module IdentityDocAuth
         end
 
         def pii_from_doc
-          return {} unless true_id_product.present? && true_id_product[:AUTHENTICATION_RESULT].present?
+          return {} unless true_id_product&.dig(:AUTHENTICATION_RESULT).present?
 
           true_id_product[:AUTHENTICATION_RESULT].select do |k, _v|
             PII_DETAILS.include? k
