@@ -27,7 +27,7 @@ module IdentityDocAuth
         def error_messages
           return {} if successful_result?
 
-          if true_id_product.present?
+          if true_id_product.present? && true_id_product[:AUTHENTICATION_RESULT].present?
             ErrorGenerator.new(config).generate_trueid_errors(response_info, @liveness_checking_enabled)
           else
             { network: true } # return a generic technical difficulties error to user
@@ -35,7 +35,7 @@ module IdentityDocAuth
         end
 
         def extra_attributes
-          if true_id_product.present?
+          if true_id_product.present? && true_id_product[:AUTHENTICATION_RESULT].present?
             attrs = response_info.merge(true_id_product[:AUTHENTICATION_RESULT])
             attrs.reject do |k, _v|
               PII_DETAILS.include? k
@@ -53,7 +53,7 @@ module IdentityDocAuth
         end
 
         def pii_from_doc
-          return {} unless true_id_product.present?
+          return {} unless true_id_product.present? && true_id_product[:AUTHENTICATION_RESULT].present?
 
           true_id_product[:AUTHENTICATION_RESULT].select do |k, _v|
             PII_DETAILS.include? k

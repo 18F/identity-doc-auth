@@ -36,12 +36,23 @@ module IdentityDocAuth
 
         def initialize(http_response)
           @http_response = http_response
-          super(
-            success: successful_result?,
-            errors: error_messages,
-            extra: extra_attributes,
-            pii_from_doc: pii_from_doc,
-          )
+
+          begin
+            super(
+              success: successful_result?,
+              errors: error_messages,
+              extra: extra_attributes,
+              pii_from_doc: pii_from_doc,
+            )
+          rescue StandardError => e
+            config.exception_notifier&.call(e)
+            super(
+              success: false,
+              errors: { network: true },
+              exception: e,
+              extra: { backtrace: e.backtrace },
+            )
+          end
         end
 
         def successful_result?

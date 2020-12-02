@@ -26,6 +26,12 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
   let(:internal_application_error_response) do
     instance_double(Faraday::Response, status: 200, body: LexisNexisFixtures.internal_application_error)
   end
+  let(:failure_response_empty) do
+    instance_double(Faraday::Response, status: 200, body: LexisNexisFixtures.true_id_failure_empty)
+  end
+  let(:failure_response_malformed) do
+    instance_double(Faraday::Response, status: 200, body: LexisNexisFixtures.true_id_response_malformed)
+  end
 
   let(:exception_notifier) { instance_double('Proc') }
 
@@ -108,6 +114,28 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
       expect(output[:success]).to eq(false)
       expect(output[:errors]).to eq(network: true)
       expect(output).to include(:lexis_nexis_status, :lexis_nexis_info)
+    end
+
+    it 'it produces reasonable output for an empty TrueID failure' do
+      expect(exception_notifier).to receive(:call).
+        with(anything, hash_including(:response_info)).once
+
+      output = described_class.new(failure_response_empty, false, config).to_h
+
+      expect(output[:success]).to eq(false)
+      expect(output[:errors]).to eq(network: true)
+      expect(output).to include(:lexis_nexis_status, :lexis_nexis_info)
+    end
+
+    it 'it produces reasonable output for a malformed TrueID response' do
+      expect(exception_notifier).to receive(:call).
+        with(anything).once
+
+      output = described_class.new(failure_response_malformed, false, config).to_h
+
+      expect(output[:success]).to eq(false)
+      expect(output[:errors]).to eq(network: true)
+      expect(output).to include(:backtrace)
     end
   end
 end

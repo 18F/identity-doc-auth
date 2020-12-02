@@ -27,6 +27,14 @@ module LexisNexisFixtures
     load_response_fixture('internal_application_error.json')
   end
 
+  def self.true_id_failure_empty
+    load_response_fixture('true_id_response_failure_empty.json')
+  end
+
+  def self.true_id_response_malformed
+    load_response_fixture('true_id_response_malformed.json')
+  end
+
   def self.load_response_fixture(filename)
     path = File.join(
       File.dirname(__FILE__),
