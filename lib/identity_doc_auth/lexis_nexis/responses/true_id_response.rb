@@ -9,6 +9,39 @@ module IdentityDocAuth
     module Responses
       class LexisNexisResponseError < StandardError; end
       class TrueIdResponse < LexisNexisResponse
+        PII_EXCLUDES = %w[
+          Age
+          DocIssuerCode
+          DocIssuerName
+          DocIssue
+          DocumentName
+          DocSize
+          DOB_Day
+          DOB_Month
+          DOB_Year
+          DocIssueType
+          ExpirationDate_Day
+          ExpirationDate_Month
+          ExpirationDate_Year
+          FullName
+          Portrait
+          Sex
+        ].freeze
+
+        PII_INCLUDES = {
+          'Fields_FirstName' => :first_name,
+          'Fields_MiddleName' => :middle_name,
+          'Fields_Surname' => :last_name,
+          'Fields_AddressLine1' => :address1,
+          'Fields_City' => :city,
+          'Fields_State' => :state,
+          'Fields_PostalCode' => :zipcode,
+          'Fields_DOB_Year' => :dob_year,
+          'Fields_DOB_Month' => :dob_month,
+          'Fields_DOB_Day' => :dob_day,
+          'Fields_DocumentNumber' => :state_id_number,
+          'Fields_IssuingStateCode' => :state_id_jurisdiction,
+        }.freeze
         attr_reader :config
 
         def initialize(http_response, liveness_checking_enabled, config)
@@ -36,10 +69,10 @@ module IdentityDocAuth
         end
 
         def extra_attributes
-          if true_id_product.present? && true_id_product[:AUTHENTICATION_RESULT].present?
+          if true_id_product&.dig(:AUTHENTICATION_RESULT).present? && true_id_product[:AUTHENTICATION_RESULT].present?
             attrs = response_info.merge(true_id_product[:AUTHENTICATION_RESULT])
             attrs.reject do |k, _v|
-              PII_DETAILS.include? k
+              PII_EXCLUDES.include? k
             end
           else
             response_status = {
@@ -54,11 +87,16 @@ module IdentityDocAuth
         end
 
         def pii_from_doc
-          return {} unless true_id_product&.dig(:AUTHENTICATION_RESULT).present?
+          return {} unless true_id_product&.dig(:IDAUTH_FIELD_DATA).present?
 
-          true_id_product[:AUTHENTICATION_RESULT].select do |k, _v|
-            PII_DETAILS.include? k
+          pii = {}
+          PII_INCLUDES.each do |key, value|
+            pii[value] = true_id_product[:IDAUTH_FIELD_DATA][key]
           end
+
+          pii[:state_id_type] = 'drivers_license'
+          pii[:dob] = "#{pii[:dob_month]}/#{pii[:dob_day]}/#{pii[:dob_year]}"
+          pii
         end
 
         private

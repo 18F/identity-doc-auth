@@ -54,7 +54,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
     end
     it 'has PII data' do
       pii_from_doc = described_class.new(success_response, false, config).pii_from_doc
-      expect(pii_from_doc).not_to be_empty
+      expect(pii_from_doc).to include(:first_name, :last_name, :dob, :state)
     end
   end
 
