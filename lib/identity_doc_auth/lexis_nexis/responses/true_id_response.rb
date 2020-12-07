@@ -69,7 +69,7 @@ module IdentityDocAuth
         end
 
         def extra_attributes
-          if true_id_product&.dig(:AUTHENTICATION_RESULT).present? && true_id_product[:AUTHENTICATION_RESULT].present?
+          if true_id_product&.dig(:AUTHENTICATION_RESULT).present?
             attrs = response_info.merge(true_id_product[:AUTHENTICATION_RESULT])
             attrs.reject do |k, _v|
               PII_EXCLUDES.include? k
@@ -90,8 +90,8 @@ module IdentityDocAuth
           return {} unless true_id_product&.dig(:IDAUTH_FIELD_DATA).present?
 
           pii = {}
-          PII_INCLUDES.each do |key, value|
-            pii[value] = true_id_product[:IDAUTH_FIELD_DATA][key]
+          PII_INCLUDES.each do |true_id_key, idp_key|
+            pii[idp_key] = true_id_product[:IDAUTH_FIELD_DATA][true_id_key]
           end
 
           pii[:state_id_type] = 'drivers_license'

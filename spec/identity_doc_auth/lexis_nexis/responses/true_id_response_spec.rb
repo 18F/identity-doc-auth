@@ -53,8 +53,16 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
       expect(extra_attributes).not_to be_empty
     end
     it 'has PII data' do
+      # This is the minimum expected by doc_pii_form in the core IDP
+      minimum_expected_hash = {
+        first_name: 'DAVID',
+        last_name: 'SAMPLE',
+        dob: '10/13/1986',
+        state: 'MD',
+      }
+
       pii_from_doc = described_class.new(success_response, false, config).pii_from_doc
-      expect(pii_from_doc).to include(:first_name, :last_name, :dob, :state)
+      expect(pii_from_doc).to include(minimum_expected_hash)
     end
   end
 
