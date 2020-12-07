@@ -9,29 +9,6 @@ module IdentityDocAuth
   module LexisNexis
     module Responses
       class LexisNexisResponse < IdentityDocAuth::Response
-        PII_DETAILS = %w[
-          Age
-          DocIssuerCode
-          DocIssuerName
-          DocumentName
-          DOB_Day
-          DOB_Month
-          DOB_Year
-          DocIssueType
-          ExpirationDate_Day
-          ExpirationDate_Month
-          ExpirationDate_Year
-          FullName
-          Portrait
-          Sex
-          Fields_Address
-          Fields_AddressLine1
-          Fields_AddressLine2
-          Fields_City
-          Fields_State
-          Fields_PostalCode
-          Fields_Height
-        ].freeze
         attr_reader :http_response
 
         def initialize(http_response)
