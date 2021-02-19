@@ -91,5 +91,24 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
         expect(response.pii_from_doc).to eq({})
       end
     end
+
+    context 'with a string that parses as YAML' do
+      let(:error_result_yaml) do
+        <<~YAML
+          data:image/gif;base64,R0lGODlhyAAiALM...DfD0QAADs=
+        YAML
+      end
+
+      it 'returns an error response that explains it should have been a hash' do
+        builder = described_class.new(error_result_yaml)
+
+        response = builder.call
+
+        expect(response.success?).to eq(false)
+        expect(response.errors).to eq(results: ['YAML data should have been a hash, got String'])
+        expect(response.exception).to eq(nil)
+        expect(response.pii_from_doc).to eq({})
+      end
+    end
   end
 end

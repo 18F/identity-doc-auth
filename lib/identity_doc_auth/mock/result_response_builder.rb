@@ -49,7 +49,12 @@ module IdentityDocAuth
 
       def parsed_yaml_from_uploaded_file
         @parsed_yaml_from_uploaded_file ||= begin
-          YAML.safe_load(uploaded_file)
+          data = YAML.safe_load(uploaded_file)
+          if data.kind_of?(Hash)
+            data
+          else
+            { 'friendly_error' => "YAML data should have been a hash, got #{data.class}" }
+          end
         rescue Psych::SyntaxError
           nil
         end
