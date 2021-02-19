@@ -19,8 +19,12 @@ module IdentityDocAuth
             extra: {
               result: result_code.name,
               billed: result_code.billed,
+              processed_alerts: processed_alerts,
+              alert_failure_count: processed_alerts[:failed].count,
+              image_metrics: process_images_data,
               raw_alerts: raw_alerts,
-            },
+              raw_regions: raw_regions,
+            }
           )
         end
 
@@ -35,7 +39,11 @@ module IdentityDocAuth
             exception: exception,
             result: result_code.name,
             billed: result_code.billed,
+            processed_alerts: processed_alerts,
+            alert_failure_count: processed_alerts[:failed].count,
+            image_metrics: process_images_data,
             raw_alerts: raw_alerts,
+            raw_regions: raw_regions,
           }
         end
 
@@ -75,6 +83,29 @@ module IdentityDocAuth
           parsed_response_body['Alerts'] || []
         end
 
+        def raw_regions
+          parsed_response_body['Regions'] || []
+        end
+
+        def regions_by_id
+          @regions_by_id ||= raw_regions.index_by { |region| region["Id"] }
+        end
+
+        def raw_images_data
+          parsed_response_body['Images'] || []
+        end
+
+        def processed_alerts
+          @processed_alerts ||= process_raw_alerts(raw_alerts)
+        end
+
+        def process_images_data
+          raw_images_data.index_by do |image|
+            image.except!('Uri')
+            get_image_side_name(image['Side']).to_sym
+          end
+        end
+
         def successful_result?
           passed_result? || attention_with_barcode?
         end
@@ -93,6 +124,47 @@ module IdentityDocAuth
               (alert_result_code == IdentityDocAuth::Acuant::ResultCodes::ATTENTION &&
                alert['Disposition'] == BARCODE_COULD_NOT_BE_READ_ERROR)
           end
+        end
+
+        def get_image_side_name(side_number)
+          side_number == 0 ? 'front' : 'back'
+        end
+
+        def get_image_info(image_id)
+          @images_by_id ||= raw_images_data.index_by { |image| image["Id"] }
+
+          @images_by_id[image_id]
+        end
+
+        def get_region_info(region_ids)
+          region = regions_by_id[region_ids.first]
+          image = get_image_info(region['ImageReference'])
+
+          {
+            region: region['Key'],
+            side: get_image_side_name(image['Side']),
+          }
+        end
+
+        def process_raw_alerts(alerts)
+          processed_alerts = { passed: [], failed: [] }
+          alerts.each do |raw_alert|
+            region_refs = raw_alert['RegionReferences']
+            new_alert = {
+              name: raw_alert['Key'],
+              result: IdentityDocAuth::Acuant::ResultCodes.from_int(raw_alert['Result']).name
+            }
+
+            new_alert.merge!(get_region_info(region_refs)) if region_refs.present?
+
+            if new_alert[:result] != IdentityDocAuth::Acuant::ResultCodes::PASSED.name
+              processed_alerts[:failed].push(new_alert)
+            else
+              processed_alerts[:passed].push(new_alert)
+            end
+          end
+
+          processed_alerts
         end
       end
     end

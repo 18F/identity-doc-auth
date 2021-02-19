@@ -31,9 +31,11 @@ module IdentityDocAuth
 
         def extra_attributes
           {
-            liveness_score: liveness_score,
-            acuant_error: acuant_error,
-            liveness_assessment: liveness_assessment,
+            selfie_liveness_results: {
+              liveness_score: liveness_score,
+              acuant_error: acuant_error,
+              liveness_assessment: liveness_assessment,
+            }
           }
         end
 

@@ -17,9 +17,11 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::LivenessResponse do
         success: true,
         errors: {},
         exception: nil,
-        liveness_assessment: 'Live',
-        liveness_score: 99,
-        acuant_error: { message: nil, code: nil },
+        selfie_liveness_results: {
+          liveness_assessment: 'Live',
+          liveness_score: 99,
+          acuant_error: { message: nil, code: nil },
+        },
       )
     end
   end
@@ -40,12 +42,14 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::LivenessResponse do
         success: false,
         errors: { selfie: true },
         exception: nil,
-        liveness_assessment: nil,
-        liveness_score: nil,
-        acuant_error: {
-          message: 'Face is too small. Move the camera closer to the face and retake the picture.',
-          code: 'FaceTooSmall',
-        },
+        selfie_liveness_results: {
+          liveness_assessment: nil,
+          liveness_score: nil,
+          acuant_error: {
+            message: 'Face is too small. Move the camera closer to the face and retake the picture.',
+            code: 'FaceTooSmall',
+          },
+        }
       )
     end
   end

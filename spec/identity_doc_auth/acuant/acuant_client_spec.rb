@@ -113,8 +113,17 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
           liveness_checking_enabled: liveness_enabled,
         )
 
+        extra_expected_hash = {
+          processed_alerts: a_hash_including(:failed, :passed),
+          alert_failure_count: 2,
+          image_metrics: a_hash_including(:back, :front),
+          face_match_results: a_hash_including(:match_score, :is_match),
+          selfie_liveness_results: a_hash_including(:liveness_score, :liveness_assessment, :acuant_error),
+        }
+
         expect(result.success?).to eq(true)
         expect(result.pii_from_doc).to_not be_empty
+        expect(result.extra).to include(extra_expected_hash)
       end
     end
 
@@ -127,8 +136,15 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
           liveness_checking_enabled: liveness_enabled,
         )
 
+        extra_expected_hash = {
+          processed_alerts: a_hash_including(:failed, :passed),
+          alert_failure_count: 2,
+          image_metrics: a_hash_including(:back, :front),
+        }
+
         expect(result.success?).to eq(true)
         expect(result.class).to eq(IdentityDocAuth::Acuant::Responses::GetResultsResponse)
+        expect(result.extra).to include(extra_expected_hash)
       end
     end
 

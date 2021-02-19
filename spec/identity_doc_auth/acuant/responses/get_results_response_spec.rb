@@ -14,19 +14,41 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
       )
     end
     let(:raw_alerts) { JSON.parse(AcuantFixtures.get_results_response_success)['Alerts'] }
+    let(:raw_regions) { JSON.parse(AcuantFixtures.get_results_response_success)['Regions'] }
 
     it 'returns a successful response with no errors' do
       expect(response.success?).to eq(true)
       expect(response.errors).to eq({})
       expect(response.exception).to be_nil
-      expect(response.to_h).to eq(
+
+      response_hash = response.to_h
+
+      expected_hash = {
         success: true,
         errors: {},
         exception: nil,
         billed: true,
         result: 'Passed',
+        processed_alerts: a_hash_including(
+          failed: all(a_hash_including(:name, :result)),
+          passed: all(a_hash_including(:name, :result))),
+        image_metrics: a_hash_including(:back, :front),
+        alert_failure_count: 2,
         raw_alerts: raw_alerts,
-      )
+        raw_regions: raw_regions,
+      }
+
+      processed_alerts = response_hash[:processed_alerts]
+      expected_alerts = {
+        passed:
+          a_collection_including(
+            a_hash_including(side: 'front', region: 'Flag Pattern'),
+            a_hash_including(side: 'front', region: 'Lower Data Labels Right')
+          )
+      }
+
+      expect(response_hash).to match(expected_hash)
+      expect(processed_alerts).to include(expected_alerts)
       expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::PASSED)
       expect(response.result_code.billed?).to eq(true)
     end
