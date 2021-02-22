@@ -1,5 +1,8 @@
 module IdentityDocAuth
   module Acuant
+    # https://documentation.help/AssureID-Connect/Error%20Codes.html
+    # 438 and 439 are frequent errors that we do not want to be notified of
+    IGNORED_ERROR_CODES = [438, 439]
     class RequestError < StandardError
       attr_reader :error_code
       def initialize(message, error_code)
@@ -77,9 +80,9 @@ module IdentityDocAuth
           interval: 0.05,
           interval_randomness: 0.5,
           backoff_factor: 2,
-          retry_statuses: [404, 438, 439],
+          retry_statuses: [404],
           retry_block: lambda do |_env, _options, retries, exc|
-            config.exception_notifier&.call(exc, retry: retries)
+            send_exception_notification(exc, retry: retries)
           end,
         }
 
@@ -105,7 +108,7 @@ module IdentityDocAuth
           http_response.status,
         ].join(' ')
         exception = RequestError.new(message, http_response.status)
-        config.exception_notifier&.call(exception)
+        send_exception_notification(exception)
         IdentityDocAuth::Response.new(
           success: false,
           errors: { network: true },
@@ -114,12 +117,17 @@ module IdentityDocAuth
       end
 
       def handle_connection_error(exception)
-        config.exception_notifier&.call(exception)
+        send_exception_notification(exception)
         IdentityDocAuth::Response.new(
           success: false,
           errors: { network: true },
           exception: exception,
         )
+      end
+
+      def send_exception_notification(exception, custom_params = nil)
+        return if exception.is_a?(RequestError) && IGNORED_ERROR_CODES.include?(exception.error_code)
+        config.exception_notifier&.call(exception, custom_params)
       end
     end
   end
