@@ -39,7 +39,7 @@ module IdentityDocAuth
           'Unexpected HTTP response',
           http_response.status,
         ].join(' ')
-        exception = RuntimeError.new(message)
+        exception = IdentityDocAuth::RequestError.new(message, http_response.status)
 
         handle_connection_error(exception)
       end
@@ -77,8 +77,8 @@ module IdentityDocAuth
 
         Faraday.new(request: faraday_request_params, url: url.to_s, headers: headers) do |conn|
           conn.request :retry, retry_options
-          conn.adapter :net_http
           conn.basic_auth username, password
+          conn.adapter :net_http
         end
       end
 
