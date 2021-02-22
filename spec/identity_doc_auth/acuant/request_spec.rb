@@ -128,57 +128,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
           )
 
         expect(exception_notifier).to receive(:call).
-          with(RuntimeError).once
-
-        expect(exception_notifier).to receive(:call).
-          with(anything, hash_including(:retry)).twice
-
-        response = subject.fetch
-
-        expect(response.success?).to eq(false)
-      end
-    end
-
-    context 'when the request resolves with a 438 status it retries' do
-      it 'calls exception_notifier each retry' do
-        allow(subject).to receive(:handle_http_response) do |http_response|
-          http_response
-        end
-
-        stub_request(:get, full_url).
-          with(headers: request_headers).
-          to_return(
-            { body: 'test response body', status: 438 },
-            { body: 'test response body', status: 438 },
-          )
-
-        expect(exception_notifier).to receive(:call).
-          with(RuntimeError).once
-
-        expect(exception_notifier).to receive(:call).
-          with(anything, hash_including(:retry)).twice
-
-        response = subject.fetch
-
-        expect(response.success?).to eq(false)
-      end
-    end
-
-    context 'when the request resolves with a 438 status it retries' do
-      it 'calls exception_notifier each retry' do
-        allow(subject).to receive(:handle_http_response) do |http_response|
-          http_response
-        end
-
-        stub_request(:get, full_url).
-          with(headers: request_headers).
-          to_return(
-            { body: 'test response body', status: 439 },
-            { body: 'test response body', status: 439 },
-          )
-
-        expect(exception_notifier).to receive(:call).
-          with(RuntimeError).once
+          with(IdentityDocAuth::RequestError, nil).once
 
         expect(exception_notifier).to receive(:call).
           with(anything, hash_including(:retry)).twice

@@ -1,5 +1,9 @@
 module IdentityDocAuth
   module Acuant
+    # https://documentation.help/AssureID-Connect/Error%20Codes.html
+    # 438 and 439 are frequent errors that we do not want to be notified of
+    IGNORED_ERROR_CODES = Set[438, 439]
+
     class Request
       attr_reader :config
 
@@ -69,19 +73,19 @@ module IdentityDocAuth
           interval: 0.05,
           interval_randomness: 0.5,
           backoff_factor: 2,
-          retry_statuses: [404, 438, 439],
+          retry_statuses: [404],
           retry_block: lambda do |_env, _options, retries, exc|
-            config.exception_notifier&.call(exc, retry: retries)
+            send_exception_notification(exc, retry: retries)
           end,
         }
 
         Faraday.new(request: faraday_request_params, url: url.to_s, headers: headers) do |conn|
-          conn.adapter :net_http
           conn.basic_auth(
             config.assure_id_username,
             config.assure_id_password,
           )
           conn.request :retry, retry_options
+          conn.adapter :net_http
         end
       end
 
@@ -96,8 +100,8 @@ module IdentityDocAuth
           'Unexpected HTTP response',
           http_response.status,
         ].join(' ')
-        exception = RuntimeError.new(message)
-        config.exception_notifier&.call(exception)
+        exception = IdentityDocAuth::RequestError.new(message, http_response.status)
+        send_exception_notification(exception)
         IdentityDocAuth::Response.new(
           success: false,
           errors: { network: true },
@@ -106,12 +110,18 @@ module IdentityDocAuth
       end
 
       def handle_connection_error(exception)
-        config.exception_notifier&.call(exception)
+        send_exception_notification(exception)
         IdentityDocAuth::Response.new(
           success: false,
           errors: { network: true },
           exception: exception,
         )
+      end
+
+      def send_exception_notification(exception, custom_params = nil)
+        return if exception.is_a?(IdentityDocAuth::RequestError) &&
+          IGNORED_ERROR_CODES.include?(exception.error_code)
+        config.exception_notifier&.call(exception, custom_params)
       end
     end
   end
