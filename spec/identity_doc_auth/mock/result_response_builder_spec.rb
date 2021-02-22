@@ -2,35 +2,24 @@ require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
   describe '#call' do
-    context 'with an image file' do
-      it 'returns a successful response with the default PII' do
-        builder = described_class.new(DocAuthImageFixtures.document_front_image)
+    subject(:builder) { described_class.new(input) }
 
+    context 'with an image file' do
+      let(:input) { DocAuthImageFixtures.document_front_image }
+
+      it 'returns a successful response with the default PII' do
         response = builder.call
 
         expect(response.success?).to eq(true)
         expect(response.errors).to eq({})
         expect(response.exception).to eq(nil)
-        expect(response.pii_from_doc).to eq(
-          first_name: 'FAKEY',
-          middle_name: nil,
-          last_name: 'MCFAKERSON',
-          address1: '1 FAKE RD',
-          address2: nil,
-          city: 'GREAT FALLS',
-          state: 'MT',
-          zipcode: '59010',
-          dob: '10/06/1938',
-          state_id_number: '1111111111111',
-          state_id_jurisdiction: 'ND',
-          state_id_type: 'drivers_license',
-          phone: nil,
-        )
+        expect(response.pii_from_doc).
+          to eq(IdentityDocAuth::Mock::ResultResponseBuilder::DEFAULT_PII_FROM_DOC)
       end
     end
 
     context 'with a yaml file containing PII' do
-      let(:successful_result_yaml) do
+      let(:input) do
         <<~YAML
           document:
             first_name: Susan
@@ -49,8 +38,6 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
       end
 
       it 'returns a result with that PII' do
-        builder = described_class.new(successful_result_yaml)
-
         response = builder.call
 
         expect(response.success?).to eq(true)
@@ -74,15 +61,13 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
     end
 
     context 'with a yaml file containing an error' do
-      let(:error_result_yaml) do
+      let(:input) do
         <<~YAML
           friendly_error: This is a test error
         YAML
       end
 
       it 'returns a result with that error' do
-        builder = described_class.new(error_result_yaml)
-
         response = builder.call
 
         expect(response.success?).to eq(false)
@@ -92,16 +77,49 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
       end
     end
 
-    context 'with a string that parses as YAML' do
-      let(:error_result_yaml) do
-        <<~YAML
+    context 'with a data URI' do
+      let(:input) do
+        <<~STR
           data:image/gif;base64,R0lGODlhyAAiALM...DfD0QAADs=
-        YAML
+        STR
+      end
+
+      it 'returns a successful response with the default PII' do
+        response = builder.call
+
+        expect(response.success?).to eq(true)
+        expect(response.errors).to eq({})
+        expect(response.exception).to eq(nil)
+        expect(response.pii_from_doc).
+          to eq(IdentityDocAuth::Mock::ResultResponseBuilder::DEFAULT_PII_FROM_DOC)
+      end
+    end
+
+    context 'with URI that is not a data URI' do
+      let(:input) do
+        <<~STR
+          https://example.com
+        STR
+      end
+
+      it 'returns an error response that explains it should have been a data URI' do
+        response = builder.call
+
+        expect(response.success?).to eq(false)
+        expect(response.errors).to eq(results: ['parsed URI, but scheme was https (expected data)'])
+        expect(response.exception).to eq(nil)
+        expect(response.pii_from_doc).to eq({})
+      end
+    end
+
+    context 'with string data that is not a URI or a hash' do
+      let(:input) do
+        <<~STR
+          something that is definitely not a URI
+        STR
       end
 
       it 'returns an error response that explains it should have been a hash' do
-        builder = described_class.new(error_result_yaml)
-
         response = builder.call
 
         expect(response.success?).to eq(false)
