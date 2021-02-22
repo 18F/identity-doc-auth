@@ -1,5 +1,13 @@
 module IdentityDocAuth
   module Acuant
+    class RequestError < StandardError
+      attr_reader :error_code
+      def initialize(message, error_code)
+        @error_code = error_code
+        super(message)
+      end
+    end
+
     class Request
       attr_reader :config
 
@@ -96,7 +104,7 @@ module IdentityDocAuth
           'Unexpected HTTP response',
           http_response.status,
         ].join(' ')
-        exception = RuntimeError.new(message)
+        exception = RequestError.new(message, http_response.status)
         config.exception_notifier&.call(exception)
         IdentityDocAuth::Response.new(
           success: false,

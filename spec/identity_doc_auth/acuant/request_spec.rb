@@ -128,7 +128,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
           )
 
         expect(exception_notifier).to receive(:call).
-          with(RuntimeError).once
+          with(IdentityDocAuth::Acuant::RequestError).once
 
         expect(exception_notifier).to receive(:call).
           with(anything, hash_including(:retry)).twice
@@ -153,7 +153,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
           )
 
         expect(exception_notifier).to receive(:call).
-          with(RuntimeError).once
+          with(IdentityDocAuth::Acuant::RequestError).once
 
         expect(exception_notifier).to receive(:call).
           with(anything, hash_including(:retry)).twice
@@ -178,7 +178,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
           )
 
         expect(exception_notifier).to receive(:call).
-          with(RuntimeError).once
+          with(IdentityDocAuth::Acuant::RequestError).once
 
         expect(exception_notifier).to receive(:call).
           with(anything, hash_including(:retry)).twice
