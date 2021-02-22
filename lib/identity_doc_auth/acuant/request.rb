@@ -80,12 +80,12 @@ module IdentityDocAuth
         }
 
         Faraday.new(request: faraday_request_params, url: url.to_s, headers: headers) do |conn|
-          conn.adapter :net_http
           conn.basic_auth(
             config.assure_id_username,
             config.assure_id_password,
           )
           conn.request :retry, retry_options
+          conn.adapter :net_http
         end
       end
 

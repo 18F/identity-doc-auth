@@ -77,8 +77,8 @@ module IdentityDocAuth
 
         Faraday.new(request: faraday_request_params, url: url.to_s, headers: headers) do |conn|
           conn.request :retry, retry_options
-          conn.adapter :net_http
           conn.basic_auth username, password
+          conn.adapter :net_http
         end
       end
 
