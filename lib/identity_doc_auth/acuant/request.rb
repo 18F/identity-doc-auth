@@ -3,13 +3,6 @@ module IdentityDocAuth
     # https://documentation.help/AssureID-Connect/Error%20Codes.html
     # 438 and 439 are frequent errors that we do not want to be notified of
     IGNORED_ERROR_CODES = Set[438, 439]
-    class RequestError < StandardError
-      attr_reader :error_code
-      def initialize(message, error_code)
-        @error_code = error_code
-        super(message)
-      end
-    end
 
     class Request
       attr_reader :config
@@ -107,7 +100,7 @@ module IdentityDocAuth
           'Unexpected HTTP response',
           http_response.status,
         ].join(' ')
-        exception = RequestError.new(message, http_response.status)
+        exception = IdentityDocAuth::RequestError.new(message, http_response.status)
         send_exception_notification(exception)
         IdentityDocAuth::Response.new(
           success: false,
@@ -126,7 +119,8 @@ module IdentityDocAuth
       end
 
       def send_exception_notification(exception, custom_params = nil)
-        return if exception.is_a?(RequestError) && IGNORED_ERROR_CODES.include?(exception.error_code)
+        return if exception.is_a?(IdentityDocAuth::RequestError) &&
+          IGNORED_ERROR_CODES.include?(exception.error_code)
         config.exception_notifier&.call(exception, custom_params)
       end
     end
