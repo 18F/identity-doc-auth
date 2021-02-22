@@ -1,6 +1,7 @@
 require 'yaml'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/hash/keys'
+require 'uri'
 
 module IdentityDocAuth
   module Mock
@@ -42,23 +43,49 @@ module IdentityDocAuth
       private
 
       def errors
-        error = parsed_yaml_from_uploaded_file&.dig('friendly_error')
-        return {} if error.blank?
-        { results: [error] }
-      end
-
-      def parsed_yaml_from_uploaded_file
-        @parsed_yaml_from_uploaded_file ||= begin
-          YAML.safe_load(uploaded_file)
-        rescue Psych::SyntaxError
-          nil
+        error = parsed_data_from_uploaded_file&.dig('friendly_error')
+        if error.blank?
+          {}
+        else
+          { results: [error] }
         end
       end
 
+      def parsed_data_from_uploaded_file
+        return @parsed_data_from_uploaded_file if defined?(@parsed_data_from_uploaded_file)
+
+        @parsed_data_from_uploaded_file = parse_uri || parse_yaml
+      end
+
+      def parse_uri
+        uri = URI.parse(uploaded_file.chomp)
+        if uri.scheme == 'data'
+          {}
+        else
+          { 'friendly_error' => "parsed URI, but scheme was #{uri.scheme} (expected data)" }
+        end
+      rescue URI::InvalidURIError
+        # no-op, allows falling through to YAML parseing
+      end
+
+      def parse_yaml
+        data = YAML.safe_load(uploaded_file)
+        if data.kind_of?(Hash)
+          data
+        else
+          { 'friendly_error' => "YAML data should have been a hash, got #{data.class}" }
+        end
+      rescue Psych::SyntaxError
+        {}
+      end
+
       def pii_from_doc
-        return DEFAULT_PII_FROM_DOC if parsed_yaml_from_uploaded_file.blank?
-        raw_pii = parsed_yaml_from_uploaded_file['document']
-        raw_pii&.symbolize_keys || {}
+        if parsed_data_from_uploaded_file.present?
+          raw_pii = parsed_data_from_uploaded_file['document']
+          raw_pii&.symbolize_keys || {}
+        else
+          DEFAULT_PII_FROM_DOC
+        end
       end
 
       def success?
