@@ -40,7 +40,7 @@ module IdentityDocAuth
             result: result_code.name,
             billed: result_code.billed,
             processed_alerts: processed_alerts,
-            alert_failure_count: processed_alerts[:failed].count,
+            alert_failure_count: processed_alerts[:failed]&.count.to_i,
             image_metrics: process_images_data,
             raw_alerts: raw_alerts,
             raw_regions: raw_regions,
