@@ -2,7 +2,7 @@ module IdentityDocAuth
   module Acuant
     # https://documentation.help/AssureID-Connect/Error%20Codes.html
     # 438 and 439 are frequent errors that we do not want to be notified of
-    IGNORED_ERROR_CODES = Set[438, 439]
+    IGNORED_ERROR_CODES = Set[438, 439, 440]
 
     class Request
       attr_reader :config
