@@ -1,10 +1,12 @@
+require 'redacted_struct'
+
 module IdentityDocAuth
   module LexisNexis
     # @!attribute [rw] exception_notifier
     #   @return [Proc] should be a proc that accepts an Exception and an optional context hash
     #   @example
     #      config.exception_notifier.call(RuntimeError.new("oh no"), attempt_count: 1)
-    Config = Struct.new(
+    Config = RedactedStruct.new(
       :account_id,
       :base_url, # required
       :request_mode,
@@ -17,6 +19,16 @@ module IdentityDocAuth
       :exception_notifier, # optional
       :locale, # required
       keyword_init: true,
+      allowed_members: [
+        :account_id,
+        :base_url,
+        :request_mode,
+        :trueid_liveness_workflow,
+        :trueid_noliveness_workflow,
+        :timeout,
+        :exception_notifier,
+        :locale,
+      ],
     ) do
       def validate!
         raise 'config missing base_url' if !base_url
