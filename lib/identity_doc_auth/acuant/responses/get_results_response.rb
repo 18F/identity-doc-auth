@@ -9,19 +9,22 @@ module IdentityDocAuth
         attr_reader :config
 
         BARCODE_COULD_NOT_BE_READ_ERROR = 'The 2D barcode could not be read'.freeze
+        DPI_THRESHOLD = 290
+        SHARP_THRESHOLD = 40
+        GLARE_THRESHOLD = 40
 
         def initialize(http_response, config)
           @http_response = http_response
           @config = config
           super(
             success: successful_result?,
-            errors: error_messages_from_alerts,
+            errors: generate_errors,
             extra: {
               result: result_code.name,
               billed: result_code.billed,
               processed_alerts: processed_alerts,
               alert_failure_count: processed_alerts[:failed]&.count.to_i,
-              image_metrics: process_images_data,
+              image_metrics: processed_image_metrics,
               raw_alerts: raw_alerts,
               raw_regions: raw_regions,
             }
@@ -41,7 +44,7 @@ module IdentityDocAuth
             billed: result_code.billed,
             processed_alerts: processed_alerts,
             alert_failure_count: processed_alerts[:failed]&.count.to_i,
-            image_metrics: process_images_data,
+            image_metrics: processed_image_metrics,
             raw_alerts: raw_alerts,
             raw_regions: raw_regions,
           }
@@ -61,6 +64,47 @@ module IdentityDocAuth
         private
 
         attr_reader :http_response
+
+        def generate_errors
+          return {} if successful_result?
+
+          front_dpi_fail, back_dpi_fail = false
+          front_sharp_fail, back_sharp_fail = false
+          front_glare_fail, back_glare_fail = false
+
+          processed_image_metrics.each do |side, i|
+            hdpi = i['HorizontalResolution'] || 0
+            vdpi = i['VerticalResolution'] || 0
+            if hdpi < DPI_THRESHOLD || vdpi < DPI_THRESHOLD
+              front_dpi_fail = true if side == :front
+              back_dpi_fail = true if side == :back
+            end
+
+            sharpness = i['SharpnessMetric']
+            if sharpness.present? && sharpness < SHARP_THRESHOLD
+              front_sharp_fail = true if side == :front
+              back_sharp_fail = true if side == :back
+            end
+
+            glare = i['GlareMetric']
+            if glare.present? && glare < GLARE_THRESHOLD
+              front_glare_fail = true if side == :front
+              back_glare_fail = true if side == :back
+            end
+          end
+
+          return { results: [Errors::DPI_LOW_BOTH_SIDES] } if front_dpi_fail && back_dpi_fail
+          return { results: [Errors::DPI_LOW_ONE_SIDE] } if front_dpi_fail || back_dpi_fail
+
+          return { results: [Errors::SHARP_LOW_BOTH_SIDES] } if front_sharp_fail && back_sharp_fail
+          return { results: [Errors::SHARP_LOW_ONE_SIDE] } if front_sharp_fail || back_sharp_fail
+
+          return { results: [Errors::GLARE_LOW_BOTH_SIDES] } if front_glare_fail && back_glare_fail
+          return { results: [Errors::GLARE_LOW_ONE_SIDE] } if front_glare_fail || back_glare_fail
+
+          #if no image metric errors default to raw error output
+          error_messages_from_alerts
+        end
 
         def error_messages_from_alerts
           return {} if successful_result?
@@ -99,10 +143,10 @@ module IdentityDocAuth
           @processed_alerts ||= process_raw_alerts(raw_alerts)
         end
 
-        def process_images_data
-          raw_images_data.index_by do |image|
+        def processed_image_metrics
+          @image_metrics ||= raw_images_data.index_by do |image|
             image.delete('Uri')
-            get_image_side_name(image['Side']).to_sym
+            get_image_side_name(image['Side'])
           end
         end
 
@@ -127,7 +171,7 @@ module IdentityDocAuth
         end
 
         def get_image_side_name(side_number)
-          side_number == 0 ? 'front' : 'back'
+          side_number == 0 ? :front : :back
         end
 
         def get_image_info(image_id)

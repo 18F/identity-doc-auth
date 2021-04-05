@@ -74,7 +74,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
       expect(output[:success]).to eq(false)
       expect(errors.keys).to contain_exactly(:general)
       expect(errors[:general]).to contain_exactly(
-        IdentityDocAuth::LexisNexis::Errors::GENERAL_ERROR_NO_LIVENESS,
+        IdentityDocAuth::Errors::GENERAL_ERROR_NO_LIVENESS,
       )
     end
 
@@ -85,7 +85,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
       expect(output[:success]).to eq(false)
       expect(errors.keys).to contain_exactly(:general)
       expect(errors[:general]).to contain_exactly(
-        IdentityDocAuth::LexisNexis::Errors::GENERAL_ERROR_LIVENESS,
+        IdentityDocAuth::Errors::GENERAL_ERROR_LIVENESS,
       )
     end
 
@@ -96,7 +96,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
       expect(output[:success]).to eq(false)
       expect(errors.keys).to contain_exactly(:general)
       expect(errors[:general]).to contain_exactly(
-        IdentityDocAuth::LexisNexis::Errors::GENERAL_ERROR_LIVENESS,
+        IdentityDocAuth::Errors::GENERAL_ERROR_LIVENESS,
       )
     end
   end
