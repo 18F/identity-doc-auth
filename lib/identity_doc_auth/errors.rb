@@ -1,6 +1,6 @@
 module IdentityDocAuth
   module Errors
-    # ALerts
+    # Alerts
     BARCODE_CONTENT_CHECK = 'barcode_content_check'
     BARCODE_READ_CHECK = 'barcode_read_check'
     BIRTH_DATE_CHECKS = 'birth_date_checks'
