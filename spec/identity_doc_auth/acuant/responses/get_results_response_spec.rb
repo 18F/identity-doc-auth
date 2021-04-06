@@ -113,6 +113,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
       )
     end
     let(:raw_alerts) { JSON.parse(AcuantFixtures.get_results_response_success)['Alerts'] }
+    let(:parsed_response_body) { JSON.parse(AcuantFixtures.get_results_response_failure) }
 
     it 'returns an unsuccessful response with errors' do
       expect(response.success?).to eq(false)
@@ -127,7 +128,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when with an acuant error message' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Alerts'].first['Disposition'] = 'This message does not have a key'
         instance_double(
           Faraday::Response,
@@ -146,7 +146,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when multiple alerts have the same friendly error' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Alerts'].first['Disposition'] = 'This message does not have a key'
         parsed_response_body['Alerts'][1] = parsed_response_body['Alerts'].first
         instance_double(
@@ -190,7 +189,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when front image HDPI is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'].first['HorizontalResolution'] = 250
         instance_double(
           Faraday::Response,
@@ -211,7 +209,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when front image VDPI is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'].first['VerticalResolution'] = 250
         instance_double(
           Faraday::Response,
@@ -232,7 +229,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when back image HDPI is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][1]['HorizontalResolution'] = 250
         instance_double(
           Faraday::Response,
@@ -253,7 +249,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when back image VDPI is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][1]['VerticalResolution'] = 250
         instance_double(
           Faraday::Response,
@@ -274,7 +269,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when front and back image DPI is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][0]['HorizontalResolution'] = 250
         parsed_response_body['Images'][1]['VerticalResolution'] = 250
         instance_double(
@@ -296,7 +290,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when front image sharpness is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][0]['SharpnessMetric'] = 25
         instance_double(
           Faraday::Response,
@@ -317,7 +310,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when back image sharpness is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][1]['SharpnessMetric'] = 25
         instance_double(
           Faraday::Response,
@@ -338,7 +330,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when both images sharpness is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][0]['SharpnessMetric'] = 25
         parsed_response_body['Images'][1]['SharpnessMetric'] = 25
         instance_double(
@@ -360,7 +351,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when a sharpness metric is missing' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][0].delete('SharpnessMetric')
         parsed_response_body['Images'][1]['SharpnessMetric'] = 25
         instance_double(
@@ -382,7 +372,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when front image glare is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][0]['GlareMetric'] = 25
         instance_double(
           Faraday::Response,
@@ -403,7 +392,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when back image glare is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][1]['GlareMetric'] = 25
         instance_double(
           Faraday::Response,
@@ -424,7 +412,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when both images glare is too low' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][0]['GlareMetric'] = 25
         parsed_response_body['Images'][1]['GlareMetric'] = 25
         instance_double(
@@ -446,7 +433,6 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when a glare metric is missing' do
       let(:http_response) do
-        parsed_response_body = JSON.parse(AcuantFixtures.get_results_response_failure)
         parsed_response_body['Images'][0].delete('GlareMetric')
         parsed_response_body['Images'][1]['GlareMetric'] = 25
         instance_double(

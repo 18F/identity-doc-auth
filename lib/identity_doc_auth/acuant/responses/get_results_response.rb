@@ -72,21 +72,21 @@ module IdentityDocAuth
           front_sharp_fail, back_sharp_fail = false
           front_glare_fail, back_glare_fail = false
 
-          processed_image_metrics.each do |side, i|
-            hdpi = i['HorizontalResolution'] || 0
-            vdpi = i['VerticalResolution'] || 0
+          processed_image_metrics.each do |side, img_metrics|
+            hdpi = img_metrics['HorizontalResolution'] || 0
+            vdpi = img_metrics['VerticalResolution'] || 0
             if hdpi < DPI_THRESHOLD || vdpi < DPI_THRESHOLD
               front_dpi_fail = true if side == :front
               back_dpi_fail = true if side == :back
             end
 
-            sharpness = i['SharpnessMetric']
+            sharpness = img_metrics['SharpnessMetric']
             if sharpness.present? && sharpness < SHARP_THRESHOLD
               front_sharp_fail = true if side == :front
               back_sharp_fail = true if side == :back
             end
 
-            glare = i['GlareMetric']
+            glare = img_metrics['GlareMetric']
             if glare.present? && glare < GLARE_THRESHOLD
               front_glare_fail = true if side == :front
               back_glare_fail = true if side == :back
