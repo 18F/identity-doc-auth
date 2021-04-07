@@ -14,6 +14,9 @@ module IdentityDocAuth
       :facial_match_url,
       :passlive_url,
       :timeout,
+      :dpi_threshold,
+      :sharpness_threshold,
+      :glare_threshold,
       :exception_notifier,
       keyword_init: true,
       allowed_members: [
@@ -22,6 +25,9 @@ module IdentityDocAuth
         :facial_match_url,
         :passlive_url,
         :timeout,
+        :dpi_threshold,
+        :sharpness_threshold,
+        :glare_threshold,
       ]
     )
   end

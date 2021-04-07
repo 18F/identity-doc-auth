@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'identity_doc_auth/lexis_nexis/errors'
+require 'identity_doc_auth/errors'
 
 module IdentityDocAuth
   module LexisNexis

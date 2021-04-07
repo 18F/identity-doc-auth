@@ -15,13 +15,13 @@ module IdentityDocAuth
           @config = config
           super(
             success: successful_result?,
-            errors: error_messages_from_alerts,
+            errors: generate_errors,
             extra: {
               result: result_code.name,
               billed: result_code.billed,
               processed_alerts: processed_alerts,
               alert_failure_count: processed_alerts[:failed]&.count.to_i,
-              image_metrics: process_images_data,
+              image_metrics: processed_image_metrics,
               raw_alerts: raw_alerts,
               raw_regions: raw_regions,
             }
@@ -31,7 +31,7 @@ module IdentityDocAuth
         # Explicitly override #to_h here because this method response object contains PII.
         # This method is used to determine what from this response gets written to events.log.
         # #to_h is defined on the super class and should not include any parts of the response that
-        # contain PII. This method is here as a safegaurd in case that changes.
+        # contain PII. This method is here as a safeguard in case that changes.
         def to_h
           {
             success: success?,
@@ -41,7 +41,7 @@ module IdentityDocAuth
             billed: result_code.billed,
             processed_alerts: processed_alerts,
             alert_failure_count: processed_alerts[:failed]&.count.to_i,
-            image_metrics: process_images_data,
+            image_metrics: processed_image_metrics,
             raw_alerts: raw_alerts,
             raw_regions: raw_regions,
           }
@@ -61,6 +61,51 @@ module IdentityDocAuth
         private
 
         attr_reader :http_response
+
+        def generate_errors
+          return {} if successful_result?
+
+          dpi_threshold = config.dpi_threshold&.to_i || 290
+          sharpness_threshold = config&.sharpness_threshold&.to_i || 40
+          glare_threshold = config&.glare_threshold&.to_i || 40
+
+          front_dpi_fail, back_dpi_fail = false
+          front_sharp_fail, back_sharp_fail = false
+          front_glare_fail, back_glare_fail = false
+
+          processed_image_metrics.each do |side, img_metrics|
+            hdpi = img_metrics['HorizontalResolution'] || 0
+            vdpi = img_metrics['VerticalResolution'] || 0
+            if hdpi < dpi_threshold || vdpi < dpi_threshold
+              front_dpi_fail = true if side == :front
+              back_dpi_fail = true if side == :back
+            end
+
+            sharpness = img_metrics['SharpnessMetric']
+            if sharpness.present? && sharpness < sharpness_threshold
+              front_sharp_fail = true if side == :front
+              back_sharp_fail = true if side == :back
+            end
+
+            glare = img_metrics['GlareMetric']
+            if glare.present? && glare < glare_threshold
+              front_glare_fail = true if side == :front
+              back_glare_fail = true if side == :back
+            end
+          end
+
+          return { results: [Errors::DPI_LOW_BOTH_SIDES] } if front_dpi_fail && back_dpi_fail
+          return { results: [Errors::DPI_LOW_ONE_SIDE] } if front_dpi_fail || back_dpi_fail
+
+          return { results: [Errors::SHARP_LOW_BOTH_SIDES] } if front_sharp_fail && back_sharp_fail
+          return { results: [Errors::SHARP_LOW_ONE_SIDE] } if front_sharp_fail || back_sharp_fail
+
+          return { results: [Errors::GLARE_LOW_BOTH_SIDES] } if front_glare_fail && back_glare_fail
+          return { results: [Errors::GLARE_LOW_ONE_SIDE] } if front_glare_fail || back_glare_fail
+
+          #if no image metric errors default to raw error output
+          error_messages_from_alerts
+        end
 
         def error_messages_from_alerts
           return {} if successful_result?
@@ -99,10 +144,10 @@ module IdentityDocAuth
           @processed_alerts ||= process_raw_alerts(raw_alerts)
         end
 
-        def process_images_data
-          raw_images_data.index_by do |image|
+        def processed_image_metrics
+          @image_metrics ||= raw_images_data.index_by do |image|
             image.delete('Uri')
-            get_image_side_name(image['Side']).to_sym
+            get_image_side_name(image['Side'])
           end
         end
 
@@ -127,7 +172,7 @@ module IdentityDocAuth
         end
 
         def get_image_side_name(side_number)
-          side_number == 0 ? 'front' : 'back'
+          side_number == 0 ? :front : :back
         end
 
         def get_image_info(image_id)
