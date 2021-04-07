@@ -9,9 +9,6 @@ module IdentityDocAuth
         attr_reader :config
 
         BARCODE_COULD_NOT_BE_READ_ERROR = 'The 2D barcode could not be read'.freeze
-        DPI_THRESHOLD = 290
-        SHARP_THRESHOLD = 40
-        GLARE_THRESHOLD = 40
 
         def initialize(http_response, config)
           @http_response = http_response
@@ -34,7 +31,7 @@ module IdentityDocAuth
         # Explicitly override #to_h here because this method response object contains PII.
         # This method is used to determine what from this response gets written to events.log.
         # #to_h is defined on the super class and should not include any parts of the response that
-        # contain PII. This method is here as a safegaurd in case that changes.
+        # contain PII. This method is here as a safeguard in case that changes.
         def to_h
           {
             success: success?,
@@ -68,6 +65,10 @@ module IdentityDocAuth
         def generate_errors
           return {} if successful_result?
 
+          dpi_threshold = config.dpi_threshold&.to_i || 290
+          sharpness_threshold = config&.sharpness_threshold&.to_i || 40
+          glare_threshold = config&.glare_threshold&.to_i || 40
+
           front_dpi_fail, back_dpi_fail = false
           front_sharp_fail, back_sharp_fail = false
           front_glare_fail, back_glare_fail = false
@@ -75,19 +76,19 @@ module IdentityDocAuth
           processed_image_metrics.each do |side, img_metrics|
             hdpi = img_metrics['HorizontalResolution'] || 0
             vdpi = img_metrics['VerticalResolution'] || 0
-            if hdpi < DPI_THRESHOLD || vdpi < DPI_THRESHOLD
+            if hdpi < dpi_threshold || vdpi < dpi_threshold
               front_dpi_fail = true if side == :front
               back_dpi_fail = true if side == :back
             end
 
             sharpness = img_metrics['SharpnessMetric']
-            if sharpness.present? && sharpness < SHARP_THRESHOLD
+            if sharpness.present? && sharpness < sharpness_threshold
               front_sharp_fail = true if side == :front
               back_sharp_fail = true if side == :back
             end
 
             glare = img_metrics['GlareMetric']
-            if glare.present? && glare < GLARE_THRESHOLD
+            if glare.present? && glare < glare_threshold
               front_glare_fail = true if side == :front
               back_glare_fail = true if side == :back
             end
