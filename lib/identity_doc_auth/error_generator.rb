@@ -59,14 +59,14 @@ module IdentityDocAuth
       unknown_fail_count = scan_for_unknown_alerts(response_info)
       alert_error_count -= unknown_fail_count
 
-      im_errors = get_image_metric_errors(response_info[:image_metrics])
-      return im_errors unless im_errors.empty?
+      image_metric_errors = get_image_metric_errors(response_info[:image_metrics])
+      return image_metric_errors unless image_metric_errors.empty?
 
       errors = get_error_messages(liveness_enabled, response_info)
       alert_error_count += 1 if errors.include?(SELFIE)
 
       if alert_error_count < 1
-        e = UnknownDocAuthError.new('LN TrueID failure escaped without useful errors')
+        e = UnknownDocAuthError.new('DocAuth failure escaped without useful errors')
         config.exception_notifier&.call(e, response_info: response_info)
 
         return { GENERAL => [general_error(liveness_enabled)] }
@@ -185,7 +185,7 @@ module IdentityDocAuth
 
       return 0 if unknown_alerts.empty?
 
-      message = 'LN TrueID responded with alert name(s) we do not handle: ' + unknown_alerts.to_s
+      message = 'DocAuth vendor responded with alert name(s) we do not handle: ' + unknown_alerts.to_s
       e = UnknownDocAuthAlert.new(message)
       config.exception_notifier&.call(e, response_info: response_info)
 
