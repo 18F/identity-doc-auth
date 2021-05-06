@@ -28,7 +28,8 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
         errors: {},
         exception: nil,
         billed: true,
-        result: 'Passed',
+        vendor: 'Acuant',
+        doc_auth_result: 'Passed',
         processed_alerts: a_hash_including(
           failed: all(a_hash_including(:name, :result)),
           passed: all(a_hash_including(:name, :result))),
@@ -84,8 +85,8 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when the only unsuccessful alert is attention barcode could not be read' do
       let(:alerts) do
-        [{ Result: 5, Disposition: 'The 2D barcode could not be read' },
-         { Result: 1, Disposition: 'The birth date is valid' }]
+        [{ Result: 5, Key: '2D Barcode Read' },
+         { Result: 1, Key: 'Birth Date Valid' }]
       end
 
       it 'is a successful result' do
@@ -95,8 +96,8 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
 
     context 'when there are other unsuccessful alerts' do
       let(:alerts) do
-        [{ Result: 5, Disposition: 'The 2D barcode could not be read' },
-         { Result: 4, Disposition: 'The birth dates do not match' }]
+        [{ Result: 5, Key: '2D Barcode Read' },
+         { Result: 4, Key: 'Birth Date Crosscheck' }]
       end
 
       it 'is not a successful result' do
@@ -118,8 +119,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
     it 'returns an unsuccessful response with errors' do
       expect(response.success?).to eq(false)
       expect(response.errors).to eq(
-        # This is the error message for the error in the response fixture
-        results: ['The document type could not be determined'],
+        :id => ["id_not_recognized"],
       )
       expect(response.exception).to be_nil
       expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
@@ -138,7 +138,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
       it 'returns the untranslated error' do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
-          results: ['This message does not have a key'],
+          :id => ["id_not_recognized"],
         )
         expect(response.exception).to be_nil
       end
@@ -157,7 +157,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
       it 'only returns one copy of the each error' do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
-          results: ['This message does not have a key'],
+          :id => ["general_error_no_liveness"],
         )
         expect(response.exception).to be_nil
       end
@@ -170,8 +170,8 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
           body: {
             Result: 2,
             Alerts: [
-              { Result: 1, Disposition: 'The birth date is valid' },
-              { Result: 2, Disposition: 'The document type could not be determined' },
+              { Result: 1, Key: 'Birth Date Valid' },
+              { Result: 2, Key: 'Document Classification' },
             ],
           }.to_json,
         )
@@ -180,13 +180,13 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
       it 'does not return errors for alerts with success result codes' do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
-          # This is the error message for the error in the response fixture
-          results: ['The document type could not be determined'],
+          :id=>["id_not_recognized"],
         )
         expect(response.exception).to be_nil
       end
     end
 
+    # leaving this as a sanity check, error_generator_spec has these tests now
     context 'when front image HDPI is too low' do
       let(:http_response) do
         parsed_response_body['Images'].first['HorizontalResolution'] = 250
@@ -199,252 +199,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
       it 'returns an unsuccessful response with front DPI error' do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::DPI_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when front image VDPI is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'].first['VerticalResolution'] = 250
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with front DPI error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::DPI_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when back image HDPI is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][1]['HorizontalResolution'] = 250
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with back DPI error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::DPI_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when back image VDPI is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][1]['VerticalResolution'] = 250
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with back DPI error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::DPI_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when front and back image DPI is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][0]['HorizontalResolution'] = 250
-        parsed_response_body['Images'][1]['VerticalResolution'] = 250
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with both DPI error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::DPI_LOW_BOTH_SIDES],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when front image sharpness is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][0]['SharpnessMetric'] = 25
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with front sharpness error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::SHARP_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when back image sharpness is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][1]['SharpnessMetric'] = 25
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with back sharpness error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::SHARP_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when both images sharpness is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][0]['SharpnessMetric'] = 25
-        parsed_response_body['Images'][1]['SharpnessMetric'] = 25
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with both sharpness error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::SHARP_LOW_BOTH_SIDES],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when a sharpness metric is missing' do
-      let(:http_response) do
-        parsed_response_body['Images'][0].delete('SharpnessMetric')
-        parsed_response_body['Images'][1]['SharpnessMetric'] = 25
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with single sharpness error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::SHARP_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when front image glare is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][0]['GlareMetric'] = 25
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with front glare error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::GLARE_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when back image glare is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][1]['GlareMetric'] = 25
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with back glare error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::GLARE_LOW_ONE_SIDE],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when both images glare is too low' do
-      let(:http_response) do
-        parsed_response_body['Images'][0]['GlareMetric'] = 25
-        parsed_response_body['Images'][1]['GlareMetric'] = 25
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with both glare error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::GLARE_LOW_BOTH_SIDES],
-        )
-        expect(response.exception).to be_nil
-        expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)
-        expect(response.result_code.billed?).to eq(false)
-      end
-    end
-
-    context 'when a glare metric is missing' do
-      let(:http_response) do
-        parsed_response_body['Images'][0].delete('GlareMetric')
-        parsed_response_body['Images'][1]['GlareMetric'] = 25
-        instance_double(
-          Faraday::Response,
-          body: parsed_response_body.to_json,
-        )
-      end
-
-      it 'returns an unsuccessful response with single glare error' do
-        expect(response.success?).to eq(false)
-        expect(response.errors).to eq(
-          results: [IdentityDocAuth::Errors::GLARE_LOW_ONE_SIDE],
+          general: [IdentityDocAuth::Errors::DPI_LOW_ONE_SIDE],
         )
         expect(response.exception).to be_nil
         expect(response.result_code).to eq(IdentityDocAuth::Acuant::ResultCodes::UNKNOWN)

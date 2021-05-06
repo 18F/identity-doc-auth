@@ -17,7 +17,10 @@ module IdentityDocAuth
       :trueid_username,
       :timeout, # optional
       :exception_notifier, # optional
-      :locale, # required
+      :locale,
+      :dpi_threshold,
+      :sharpness_threshold,
+      :glare_threshold, # required
       keyword_init: true,
       allowed_members: [
         :account_id,
@@ -28,6 +31,9 @@ module IdentityDocAuth
         :timeout,
         :exception_notifier,
         :locale,
+        :dpi_threshold,
+        :sharpness_threshold,
+        :glare_threshold,
       ],
     ) do
       def validate!
