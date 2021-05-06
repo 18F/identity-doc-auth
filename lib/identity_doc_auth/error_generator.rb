@@ -152,8 +152,8 @@ module IdentityDocAuth
         end
       end
 
-      pm_results = response_info[:PortraitMatchResults] || {}
-      if liveness_enabled && pm_results.dig(:FaceMatchResult) != 'Pass'
+      portrait_match_results = response_info[:portrait_match_results] || {}
+      if liveness_enabled && portrait_match_results.dig(:FaceMatchResult) != 'Pass'
         errors[SELFIE] << Errors::SELFIE_FAILURE
       end
 

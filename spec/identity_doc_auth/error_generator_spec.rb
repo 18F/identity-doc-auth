@@ -18,18 +18,18 @@ RSpec.describe IdentityDocAuth::ErrorGenerator do
     image_metrics: {}
   )
     {
-      ConversationId: 31000406181234,
-      Reference: 'Reference1',
+      conversation_id: 31000406181234,
+      reference: 'Reference1',
       liveness_enabled: liveness_result.present? ? true : false,
       vendor: 'Test',
-      TransactionReasonCode: 'testing',
+      transaction_reason_code: 'testing',
       doc_auth_result: doc_result,
       processed_alerts: {
         passed: passed,
         failed: failed,
       },
       alert_failure_count: failed.length,
-      PortraitMatchResults: { FaceMatchResult: liveness_result },
+      portrait_match_results: { FaceMatchResult: liveness_result },
       image_metrics: image_metrics,
     }
   end

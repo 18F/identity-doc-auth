@@ -109,15 +109,15 @@ module IdentityDocAuth
           alerts = parse_alerts
 
           {
-            ConversationId: conversation_id,
-            Reference: reference,
+            conversation_id: conversation_id,
+            reference: reference,
             liveness_enabled: @liveness_checking_enabled,
             vendor: 'TrueID',
-            TransactionReasonCode: transaction_reason_code,
+            transaction_reason_code: transaction_reason_code,
             doc_auth_result: doc_auth_result,
             processed_alerts: alerts,
             alert_failure_count: alerts[:failed].length,
-            PortraitMatchResults: true_id_product[:PORTRAIT_MATCH_RESULT],
+            portrait_match_results: true_id_product[:PORTRAIT_MATCH_RESULT],
             image_metrics: parse_image_metrics,
           }
         end
