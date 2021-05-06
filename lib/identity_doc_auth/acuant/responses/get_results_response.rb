@@ -1,6 +1,7 @@
 require 'identity_doc_auth/acuant/pii_from_doc'
 require 'identity_doc_auth/acuant/result_codes'
 require 'identity_doc_auth/response'
+require 'identity_doc_auth/error_generator'
 
 module IdentityDocAuth
   module Acuant
@@ -8,7 +9,7 @@ module IdentityDocAuth
       class GetResultsResponse < IdentityDocAuth::Response
         attr_reader :config
 
-        BARCODE_COULD_NOT_BE_READ_ERROR = 'The 2D barcode could not be read'.freeze
+        BARCODE_COULD_NOT_BE_READ_ERROR = '2D Barcode Read'.freeze
 
         def initialize(http_response, config)
           @http_response = http_response
@@ -37,14 +38,8 @@ module IdentityDocAuth
             success: success?,
             errors: errors,
             exception: exception,
-            result: result_code.name,
             billed: result_code.billed,
-            processed_alerts: processed_alerts,
-            alert_failure_count: processed_alerts[:failed]&.count.to_i,
-            image_metrics: processed_image_metrics,
-            raw_alerts: raw_alerts,
-            raw_regions: raw_regions,
-          }
+          }.merge(response_info)
         end
 
         # @return [DocAuth::Acuant::ResultCode::ResultCode]
@@ -62,62 +57,28 @@ module IdentityDocAuth
 
         attr_reader :http_response
 
+        def response_info
+          @response_info ||= create_response_info
+        end
+
+        def create_response_info
+          alerts = processed_alerts
+
+          {
+            vendor: 'Acuant',
+            doc_auth_result: result_code.name,
+            processed_alerts: alerts,
+            alert_failure_count: alerts[:failed]&.count.to_i,
+            image_metrics: processed_image_metrics,
+            raw_alerts: raw_alerts,
+            raw_regions: raw_regions,
+          }
+        end
+
         def generate_errors
           return {} if successful_result?
 
-          dpi_threshold = config.dpi_threshold&.to_i || 290
-          sharpness_threshold = config&.sharpness_threshold&.to_i || 40
-          glare_threshold = config&.glare_threshold&.to_i || 40
-
-          front_dpi_fail, back_dpi_fail = false
-          front_sharp_fail, back_sharp_fail = false
-          front_glare_fail, back_glare_fail = false
-
-          processed_image_metrics.each do |side, img_metrics|
-            hdpi = img_metrics['HorizontalResolution'] || 0
-            vdpi = img_metrics['VerticalResolution'] || 0
-            if hdpi < dpi_threshold || vdpi < dpi_threshold
-              front_dpi_fail = true if side == :front
-              back_dpi_fail = true if side == :back
-            end
-
-            sharpness = img_metrics['SharpnessMetric']
-            if sharpness.present? && sharpness < sharpness_threshold
-              front_sharp_fail = true if side == :front
-              back_sharp_fail = true if side == :back
-            end
-
-            glare = img_metrics['GlareMetric']
-            if glare.present? && glare < glare_threshold
-              front_glare_fail = true if side == :front
-              back_glare_fail = true if side == :back
-            end
-          end
-
-          return { results: [Errors::DPI_LOW_BOTH_SIDES] } if front_dpi_fail && back_dpi_fail
-          return { results: [Errors::DPI_LOW_ONE_SIDE] } if front_dpi_fail || back_dpi_fail
-
-          return { results: [Errors::SHARP_LOW_BOTH_SIDES] } if front_sharp_fail && back_sharp_fail
-          return { results: [Errors::SHARP_LOW_ONE_SIDE] } if front_sharp_fail || back_sharp_fail
-
-          return { results: [Errors::GLARE_LOW_BOTH_SIDES] } if front_glare_fail && back_glare_fail
-          return { results: [Errors::GLARE_LOW_ONE_SIDE] } if front_glare_fail || back_glare_fail
-
-          #if no image metric errors default to raw error output
-          error_messages_from_alerts
-        end
-
-        def error_messages_from_alerts
-          return {} if successful_result?
-
-          unsuccessful_alerts = raw_alerts.filter do |raw_alert|
-            alert_result_code = IdentityDocAuth::Acuant::ResultCodes.from_int(raw_alert['Result'])
-            alert_result_code != IdentityDocAuth::Acuant::ResultCodes::PASSED
-          end
-
-          {
-            results: unsuccessful_alerts.map { |alert| alert['Disposition'] }.uniq,
-          }
+          ErrorGenerator.new(config).generate_doc_auth_errors(response_info)
         end
 
         def parsed_response_body
@@ -167,7 +128,7 @@ module IdentityDocAuth
 
             alert_result_code == IdentityDocAuth::Acuant::ResultCodes::PASSED ||
               (alert_result_code == IdentityDocAuth::Acuant::ResultCodes::ATTENTION &&
-               alert['Disposition'] == BARCODE_COULD_NOT_BE_READ_ERROR)
+               alert['Key'] == BARCODE_COULD_NOT_BE_READ_ERROR)
           end
         end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'active_support/core_ext/object/blank'
-require 'identity_doc_auth/lexis_nexis/error_generator'
+require 'identity_doc_auth/error_generator'
 require 'identity_doc_auth/lexis_nexis/responses/lexis_nexis_response'
 
 module IdentityDocAuth
@@ -62,7 +62,7 @@ module IdentityDocAuth
           return {} if successful_result?
 
           if true_id_product&.dig(:AUTHENTICATION_RESULT).present?
-            ErrorGenerator.new(config).generate_trueid_errors(response_info, @liveness_checking_enabled)
+            ErrorGenerator.new(config).generate_doc_auth_errors(response_info)
           else
             { network: true } # return a generic technical difficulties error to user
           end
@@ -109,16 +109,16 @@ module IdentityDocAuth
           alerts = parse_alerts
 
           {
-            ConversationId: conversation_id,
-            Reference: reference,
-            LivenessChecking: @liveness_checking_enabled,
-            ProductType: 'TrueID',
-            TransactionReasonCode: transaction_reason_code,
-            IdentityDocAuthResult: doc_auth_result,
-            Alerts: alerts,
-            AlertFailureCount: alerts[:failed].length,
-            PortraitMatchResults: true_id_product[:PORTRAIT_MATCH_RESULT],
-            ImageMetrics: parse_image_metrics,
+            conversation_id: conversation_id,
+            reference: reference,
+            liveness_enabled: @liveness_checking_enabled,
+            vendor: 'TrueID',
+            transaction_reason_code: transaction_reason_code,
+            doc_auth_result: doc_auth_result,
+            processed_alerts: alerts,
+            alert_failure_count: alerts[:failed].length,
+            portrait_match_results: true_id_product[:PORTRAIT_MATCH_RESULT],
+            image_metrics: parse_image_metrics,
           }
         end
 
