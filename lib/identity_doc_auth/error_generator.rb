@@ -68,7 +68,7 @@ module IdentityDocAuth
 
       if alert_error_count < 1
         e = UnknownDocAuthError.new('DocAuth failure escaped without useful errors')
-        config.exception_notifier&.call(e, response_info: response_info)
+        config.exception_notifier&.call(e, { response_info: response_info }, true)
 
         return { GENERAL => [general_error(liveness_enabled)] }
       # if the alert_error_count is 1 it is just passed along
@@ -188,7 +188,7 @@ module IdentityDocAuth
 
       message = 'DocAuth vendor responded with alert name(s) we do not handle: ' + unknown_alerts.to_s
       e = UnknownDocAuthAlert.new(message)
-      config.exception_notifier&.call(e, response_info: response_info)
+      config.exception_notifier&.call(e, { response_info: response_info }, true)
 
       unknown_fail_count
     end
