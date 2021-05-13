@@ -45,6 +45,7 @@ module IdentityDocAuth
       'Issue Date Valid': { type: ID, msg_key: Errors::ISSUE_DATE_CHECKS },
       'Layout Valid': { type: ID, msg_key: Errors::ID_NOT_VERIFIED },
       'Near-Infrared Response': { type: ID, msg_key: Errors::ID_NOT_VERIFIED },
+      'Physical Document Presence': { type: ID, msg_key: Errors::ID_NOT_VERIFIED },
       'Sex Crosscheck': { type: ID, msg_key: Errors::SEX_CHECK },
       'Visible Color Response': { type: ID, msg_key: Errors::VISIBLE_COLOR_CHECK },
       'Visible Pattern': { type: ID, msg_key: Errors::ID_NOT_VERIFIED },
