@@ -111,7 +111,7 @@ RSpec.describe IdentityDocAuth::ErrorGenerator do
       )
 
       expect(exception_notifier).to receive(:call).
-        with(anything, hash_including(:response_info)).twice
+        with(anything, hash_including(:response_info), true).twice
 
       output = described_class.new(config).generate_doc_auth_errors(error_info)
 
@@ -129,7 +129,7 @@ RSpec.describe IdentityDocAuth::ErrorGenerator do
       )
 
       expect(exception_notifier).to receive(:call).
-        with(anything, hash_including(:response_info)).once
+        with(anything, hash_including(:response_info), true).once
 
       output = described_class.new(config).generate_doc_auth_errors(error_info)
 
@@ -145,7 +145,7 @@ RSpec.describe IdentityDocAuth::ErrorGenerator do
       )
 
       expect(exception_notifier).to receive(:call).
-        with(anything, hash_including(:response_info)).once
+        with(anything, hash_including(:response_info), true).once
 
       output = described_class.new(config).generate_doc_auth_errors(error_info)
 
