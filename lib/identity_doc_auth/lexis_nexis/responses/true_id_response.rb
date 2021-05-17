@@ -116,7 +116,7 @@ module IdentityDocAuth
             transaction_reason_code: transaction_reason_code,
             doc_auth_result: doc_auth_result,
             processed_alerts: alerts,
-            alert_failure_count: alerts[:failed].length,
+            alert_failure_count: alerts[:failed]&.count.to_i,
             portrait_match_results: true_id_product[:PORTRAIT_MATCH_RESULT],
             image_metrics: parse_image_metrics,
           }

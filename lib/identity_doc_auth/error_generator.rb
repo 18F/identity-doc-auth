@@ -99,13 +99,13 @@ module IdentityDocAuth
     # private
 
     def get_image_metric_errors(processed_image_metrics)
-      dpi_threshold = config.dpi_threshold&.to_i || 290
+      dpi_threshold = config&.dpi_threshold&.to_i || 290
       sharpness_threshold = config&.sharpness_threshold&.to_i || 40
       glare_threshold = config&.glare_threshold&.to_i || 40
 
-      front_dpi_fail, back_dpi_fail = false
-      front_sharp_fail, back_sharp_fail = false
-      front_glare_fail, back_glare_fail = false
+      front_dpi_fail, back_dpi_fail = false, false
+      front_sharp_fail, back_sharp_fail = false, false
+      front_glare_fail, back_glare_fail = false, false
 
       processed_image_metrics.each do |side, img_metrics|
         hdpi = img_metrics['HorizontalResolution']&.to_i || 0

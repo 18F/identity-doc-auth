@@ -28,7 +28,7 @@ RSpec.describe IdentityDocAuth::ErrorGenerator do
         passed: passed,
         failed: failed,
       },
-      alert_failure_count: failed.length,
+      alert_failure_count: failed&.count.to_i,
       portrait_match_results: { FaceMatchResult: liveness_result },
       image_metrics: image_metrics,
     }

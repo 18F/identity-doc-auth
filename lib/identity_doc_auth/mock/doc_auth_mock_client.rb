@@ -1,3 +1,4 @@
+require 'identity_doc_auth/mock/config'
 require 'securerandom'
 require 'identity_doc_auth/mock/responses/create_document_response'
 
@@ -71,16 +72,22 @@ module IdentityDocAuth
         process_results(instance_id, liveness_checking_enabled, selfie_image)
       end
 
-      def get_results(instance_id:)
+      def get_results(instance_id:, liveness_enabled:)
         return mocked_response_for_method(__method__) if method_mocked?(__method__)
 
-        ResultResponseBuilder.new(self.class.last_uploaded_back_image).call
+        config = Config.new({
+          dpi_threshold: 290,
+          sharpness_threshold: 40,
+          glare_threshold: 40,
+        })
+
+        ResultResponseBuilder.new(self.class.last_uploaded_back_image, config, liveness_enabled).call
       end
 
       private
 
       def process_results(instance_id, liveness_checking_enabled, selfie_image)
-        results_response = get_results(instance_id: instance_id)
+        results_response = get_results(instance_id: instance_id, liveness_enabled: liveness_checking_enabled)
         return results_response unless results_response.success?
 
         if liveness_checking_enabled
