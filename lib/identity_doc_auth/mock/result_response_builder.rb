@@ -50,20 +50,21 @@ module IdentityDocAuth
         if file_data.blank?
           {}
         else
-          doc_auth_result = file_data.dig('doc_auth_result') || ''
-          image_metrics = file_data.dig('image_metrics') || {}
-          failed = file_data.dig('failed_alerts') || []
-          passed = file_data.dig('passed_alerts') || []
-          liveness_result = file_data.dig('liveness_result') || ''
+          doc_auth_result = file_data.dig('doc_auth_result')
+          image_metrics = file_data.dig('image_metrics')
+          failed = file_data.dig('failed_alerts')
+          passed = file_data.dig('passed_alerts')
+          liveness_result = file_data.dig('liveness_result')
 
           if [doc_auth_result, image_metrics, failed, passed, liveness_result].any?(&:present?)
-            fake_response_info = create_response_info(
-              doc_auth_result: doc_auth_result,
-              image_metrics: image_metrics&.symbolize_keys,
-              failed: failed.map!(&:symbolize_keys),
-              passed: passed.map!(&:symbolize_keys),
-              liveness_result: liveness_result
-            )
+            mock_args = {}
+            mock_args.merge!(doc_auth_result: doc_auth_result) if doc_auth_result.present?
+            mock_args.merge!(image_metrics: image_metrics.symbolize_keys) if image_metrics.present?
+            mock_args.merge!(failed: failed.map!(&:symbolize_keys)) if failed.present?
+            mock_args.merge!(passed: passed.map!(&:symbolize_keys)) if passed.present?
+            mock_args.merge!(liveness_result: liveness_result) if liveness_result.present?
+
+            fake_response_info = create_response_info(**mock_args)
 
             ErrorGenerator.new(config).generate_doc_auth_errors(fake_response_info)
           else

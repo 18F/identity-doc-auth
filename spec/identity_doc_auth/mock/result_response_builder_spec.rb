@@ -158,5 +158,32 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
         expect(response.pii_from_doc).to eq({})
       end
     end
+
+    context 'with a yaml file containing a passing result' do
+      subject(:builder) {
+        config = IdentityDocAuth::Mock::Config.new({
+          dpi_threshold: 290,
+          sharpness_threshold: 40,
+          glare_threshold: 40,
+        })
+        described_class.new(input, config, true)
+      }
+
+      let(:input) do
+        <<~YAML
+          doc_auth_result: Passed
+          liveness_result: Fail
+        YAML
+      end
+
+      it 'returns a passed result' do
+        response = builder.call
+
+        expect(response.success?).to eq(false)
+        expect(response.errors).to eq({ selfie: [IdentityDocAuth::Errors::SELFIE_FAILURE]})
+        expect(response.exception).to eq(nil)
+        expect(response.pii_from_doc).to eq({})
+      end
+    end
   end
 end
