@@ -75,11 +75,11 @@ module IdentityDocAuth
       def get_results(instance_id:, liveness_enabled:)
         return mocked_response_for_method(__method__) if method_mocked?(__method__)
 
-        config = Config.new({
+        config = Config.new(
           dpi_threshold: 290,
           sharpness_threshold: 40,
           glare_threshold: 40,
-        })
+        )
 
         ResultResponseBuilder.new(self.class.last_uploaded_back_image, config, liveness_enabled).call
       end

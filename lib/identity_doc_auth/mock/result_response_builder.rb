@@ -50,18 +50,21 @@ module IdentityDocAuth
         if file_data.blank?
           {}
         else
-          image_metrics = file_data&.dig('image_metrics') || {}
-          failed = file_data&.dig('failed_alerts') || []
-          passed = file_data&.dig('passed_alerts') || []
-          liveness_result = file_data&.dig('liveness_result') || ''
+          doc_auth_result = file_data.dig('doc_auth_result') || ''
+          image_metrics = file_data.dig('image_metrics') || {}
+          failed = file_data.dig('failed_alerts') || []
+          passed = file_data.dig('passed_alerts') || []
+          liveness_result = file_data.dig('liveness_result') || ''
 
-          if [image_metrics,failed, passed, liveness_result].any?(&:present?)
+          if [doc_auth_result, image_metrics, failed, passed, liveness_result].any?(&:present?)
             fake_response_info = create_response_info(
+              doc_auth_result: doc_auth_result,
               image_metrics: image_metrics&.symbolize_keys,
               failed: failed.map!(&:symbolize_keys),
               passed: passed.map!(&:symbolize_keys),
               liveness_result: liveness_result
             )
+
             ErrorGenerator.new(config).generate_doc_auth_errors(fake_response_info)
           else
             # general is the key for errors that come from parsing
@@ -114,16 +117,16 @@ module IdentityDocAuth
       DEFAULT_FAILED_ALERTS = [{ name: '2D Barcode Read', result: 'Failed' }].freeze
       DEFAULT_IMAGE_METRICS = {
         front: {
-          "VerticalResolution" => 300,
-          "HorizontalResolution" => 300,
-          "GlareMetric" => 50,
-          "SharpnessMetric" => 50,
+          "VerticalResolution" => 600,
+          "HorizontalResolution" => 600,
+          "GlareMetric" => 100,
+          "SharpnessMetric" => 100,
         },
         back: {
-          "VerticalResolution" => 300,
-          "HorizontalResolution" => 300,
-          "GlareMetric" => 50,
-          "SharpnessMetric" => 50,
+          "VerticalResolution" => 600,
+          "HorizontalResolution" => 600,
+          "GlareMetric" => 100,
+          "SharpnessMetric" => 100,
         }
       }.freeze
 
