@@ -22,7 +22,7 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
       instance_id: instance_id,
       image: DocAuthImageFixtures.document_back_image,
     )
-    get_results_response = client.get_results(instance_id: instance_id)
+    get_results_response = client.get_results(instance_id: instance_id, liveness_enabled: false)
 
     selfie_response = client.post_selfie(
       instance_id: instance_id,
@@ -82,7 +82,10 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
       instance_id: instance_id,
       image: yaml,
     )
-    get_results_response = client.get_results(instance_id: create_document_response.instance_id)
+    get_results_response = client.get_results(
+      instance_id: create_document_response.instance_id,
+      liveness_enabled: false
+    )
 
     expect(get_results_response.pii_from_doc).to eq(
       first_name: 'Susan',

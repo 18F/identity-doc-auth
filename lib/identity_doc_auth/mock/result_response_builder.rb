@@ -22,10 +22,12 @@ module IdentityDocAuth
         phone: nil,
       }.freeze
 
-      attr_reader :uploaded_file
+      attr_reader :uploaded_file, :config, :liveness_enabled
 
-      def initialize(uploaded_file)
+      def initialize(uploaded_file, config, liveness_enabled)
         @uploaded_file = uploaded_file.to_s
+        @config = config
+        @liveness_enabled = liveness_enabled
       end
 
       def call
@@ -43,11 +45,32 @@ module IdentityDocAuth
       private
 
       def errors
-        error = parsed_data_from_uploaded_file&.dig('friendly_error')
-        if error.blank?
+        file_data = parsed_data_from_uploaded_file
+
+        if file_data.blank?
           {}
         else
-          { results: [error] }
+          doc_auth_result = file_data.dig('doc_auth_result')
+          image_metrics = file_data.dig('image_metrics')
+          failed = file_data.dig('failed_alerts')
+          passed = file_data.dig('passed_alerts')
+          liveness_result = file_data.dig('liveness_result')
+
+          if [doc_auth_result, image_metrics, failed, passed, liveness_result].any?(&:present?)
+            mock_args = {}
+            mock_args.merge!(doc_auth_result: doc_auth_result) if doc_auth_result.present?
+            mock_args.merge!(image_metrics: image_metrics.symbolize_keys) if image_metrics.present?
+            mock_args.merge!(failed: failed.map!(&:symbolize_keys)) if failed.present?
+            mock_args.merge!(passed: passed.map!(&:symbolize_keys)) if passed.present?
+            mock_args.merge!(liveness_result: liveness_result) if liveness_result.present?
+
+            fake_response_info = create_response_info(**mock_args)
+
+            ErrorGenerator.new(config).generate_doc_auth_errors(fake_response_info)
+          else
+            # general is the key for errors that come from parsing
+            file_data if file_data.include?(:general)
+          end
         end
       end
 
@@ -62,10 +85,10 @@ module IdentityDocAuth
         if uri.scheme == 'data'
           {}
         else
-          { 'friendly_error' => "parsed URI, but scheme was #{uri.scheme} (expected data)" }
+          { general: ["parsed URI, but scheme was #{uri.scheme} (expected data)"] }
         end
       rescue URI::InvalidURIError
-        # no-op, allows falling through to YAML parseing
+        # no-op, allows falling through to YAML parsing
       end
 
       def parse_yaml
@@ -73,7 +96,7 @@ module IdentityDocAuth
         if data.kind_of?(Hash)
           data
         else
-          { 'friendly_error' => "YAML data should have been a hash, got #{data.class}" }
+          { general: ["YAML data should have been a hash, got #{data.class}"] }
         end
       rescue Psych::SyntaxError
         {}
@@ -90,6 +113,44 @@ module IdentityDocAuth
 
       def success?
         errors.blank?
+      end
+
+      DEFAULT_FAILED_ALERTS = [{ name: '2D Barcode Read', result: 'Failed' }].freeze
+      DEFAULT_IMAGE_METRICS = {
+        front: {
+          "VerticalResolution" => 600,
+          "HorizontalResolution" => 600,
+          "GlareMetric" => 100,
+          "SharpnessMetric" => 100,
+        },
+        back: {
+          "VerticalResolution" => 600,
+          "HorizontalResolution" => 600,
+          "GlareMetric" => 100,
+          "SharpnessMetric" => 100,
+        }
+      }.freeze
+
+      def create_response_info(
+        doc_auth_result: 'Failed',
+        passed: [],
+        failed: DEFAULT_FAILED_ALERTS,
+        liveness_result: nil,
+        image_metrics: DEFAULT_IMAGE_METRICS
+      )
+        merged_image_metrics = DEFAULT_IMAGE_METRICS.deep_merge(image_metrics)
+        {
+          vendor: 'Mock',
+          doc_auth_result: doc_auth_result,
+          processed_alerts: {
+            passed: passed,
+            failed: failed,
+          },
+          alert_failure_count: failed&.count.to_i,
+          image_metrics: merged_image_metrics,
+          liveness_enabled: liveness_enabled,
+          portrait_match_results: { FaceMatchResult: liveness_result },
+        }
       end
     end
   end
