@@ -36,7 +36,7 @@ module IdentityDocAuth
       'Control Number Crosscheck': { type: BACK, msg_key: Errors::CONTROL_NUMBER_CHECK },
       'Document Classification': { type: ID, msg_key: Errors::ID_NOT_RECOGNIZED },
       'Document Crosscheck Aggregation': { type: ID, msg_key: Errors::DOC_CROSSCHECK },
-      'Document Expired': { type: ID, msg_key: Errors::DOCUMENT_EXPIRED },
+      'Document Expired': { type: ID, msg_key: Errors::DOCUMENT_EXPIRED_CHECK },
       'Document Number Crosscheck': { type: ID, msg_key: Errors::DOC_NUMBER_CHECKS },
       'Expiration Date Crosscheck': { type: ID, msg_key: Errors::EXPIRATION_CHECKS },
       'Expiration Date Valid': { type: ID, msg_key: Errors::EXPIRATION_CHECKS },

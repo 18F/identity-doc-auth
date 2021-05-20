@@ -7,7 +7,7 @@ module IdentityDocAuth
     CONTROL_NUMBER_CHECK = 'control_number_check'
     DOC_CROSSCHECK = 'doc_crosscheck'
     DOC_NUMBER_CHECKS = 'doc_number_checks'
-    DOCUMENT_EXPIRED = 'doc_expired' # document has expired
+    DOCUMENT_EXPIRED_CHECK = 'doc_expired_check' # document has expired
     EXPIRATION_CHECKS = 'expiration_checks' # expiration date valid, expiration crosscheck
     FULL_NAME_CHECK = 'full_name_check'
     GENERAL_ERROR_LIVENESS = 'general_error_liveness'
