@@ -20,6 +20,9 @@ module IdentityDocAuth
           DOB_Month
           DOB_Year
           DocIssueType
+          ExpirationDate_Day
+          ExpirationDate_Month
+          ExpirationDate_Year
           FullName
           Portrait
           Sex
