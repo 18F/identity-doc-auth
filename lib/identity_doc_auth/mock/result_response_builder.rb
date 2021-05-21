@@ -2,7 +2,6 @@ require 'yaml'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/hash/keys'
 require 'uri'
-require 'date'
 
 module IdentityDocAuth
   module Mock
@@ -20,7 +19,7 @@ module IdentityDocAuth
         state_id_number: '1111111111111',
         state_id_jurisdiction: 'ND',
         state_id_type: 'drivers_license',
-        state_id_expiration: (Date.today + 365).strftime('%m/%d/%Y'),
+        state_id_expiration: '12/31/2099',
         phone: nil,
       }.freeze
 
