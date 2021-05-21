@@ -99,9 +99,15 @@ module IdentityDocAuth
 
           pii[:state_id_type] = 'drivers_license'
 
-          pii[:dob] = "#{pii[:dob_month]}/#{pii[:dob_day]}/#{pii[:dob_year]}"
+          if pii[:dob_month] && pii[:dob_day] && pii[:dob_year]
+            pii[:dob] = [
+              pii.delete(:dob_month),
+              pii.delete(:dob_day),
+              pii.delete(:dob_year),
+            ].join('/')
+          end
 
-          if pii[:state_id_expiration_day] && pii[:state_id_expiration_month] && pii[:state_id_expiration_year]
+          if pii[:state_id_expiration_month] && pii[:state_id_expiration_day] && pii[:state_id_expiration_year]
             pii[:state_id_expiration] = [
               pii.delete(:state_id_expiration_month),
               pii.delete(:state_id_expiration_day),
