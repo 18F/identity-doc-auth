@@ -366,7 +366,7 @@
          },
                   {
             "Group": "IDAUTH_FIELD_DATA",
-            "Name": "Fields_ExpirationDate_Day",
+            "Name": "Fields_xpirationDate_Day",
             "Values": [{"Value": "5"}]
          },
                   {
