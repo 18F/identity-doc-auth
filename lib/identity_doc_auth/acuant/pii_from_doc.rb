@@ -14,6 +14,7 @@ module IdentityDocAuth
         'Birth Date' => :dob,
         'Document Number' => :state_id_number,
         'Issuing State Code' => :state_id_jurisdiction,
+        'Expiration Date' => :state_id_expiration,
       }.freeze
 
       def initialize(id_data_fields)
@@ -29,6 +30,7 @@ module IdentityDocAuth
         end
         hash[:state_id_type] = 'drivers_license'
         hash[:dob] = convert_date(hash[:dob])
+        hash[:state_id_expiration] = convert_date(hash[:state_id_expiration])
         hash
       end
 

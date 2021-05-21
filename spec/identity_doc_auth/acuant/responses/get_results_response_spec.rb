@@ -65,6 +65,7 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
         state: 'ND',
         zipcode: '58501',
         dob: '04/01/1984',
+        state_id_expiration: '10/24/2022',
         state_id_number: 'DOE-84-1165',
         state_id_jurisdiction: 'ND',
         state_id_type: 'drivers_license',

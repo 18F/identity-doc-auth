@@ -33,7 +33,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
     instance_double(Faraday::Response, status: 200, body: LexisNexisFixtures.true_id_response_malformed)
   end
 
-  let(:exception_notifier) { instance_double('Proc') }
+  let(:exception_notifier) { proc { } }
 
   let(:config) do
     IdentityDocAuth::LexisNexis::Config.new(
@@ -42,14 +42,16 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
   end
 
   context 'when the response is a success' do
+    let(:response) { described_class.new(success_response, false, config) }
+
     it 'is a successful result' do
-      expect(described_class.new(success_response, false, config).successful_result?).to eq(true)
+      expect(response.successful_result?).to eq(true)
     end
     it 'has no error messages' do
-      expect(described_class.new(success_response, false, config).error_messages).to be_empty
+      expect(response.error_messages).to be_empty
     end
     it 'has extra attributes' do
-      extra_attributes = described_class.new(success_response, false, config).extra_attributes
+      extra_attributes = response.extra_attributes
       expect(extra_attributes).not_to be_empty
     end
     it 'has PII data' do
@@ -61,8 +63,10 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
         state: 'MD',
       }
 
-      pii_from_doc = described_class.new(success_response, false, config).pii_from_doc
-      expect(pii_from_doc).to include(minimum_expected_hash)
+      expect(response.pii_from_doc).to include(minimum_expected_hash)
+    end
+    it 'includes expiration' do
+      expect(response.pii_from_doc).to include(state_id_expiration: '10/15/2099')
     end
   end
 

@@ -41,6 +41,9 @@ module IdentityDocAuth
           'Fields_DOB_Day' => :dob_day,
           'Fields_DocumentNumber' => :state_id_number,
           'Fields_IssuingStateCode' => :state_id_jurisdiction,
+          'Fields_xpirationDate_Day' => :state_id_expiration_day, # this is NOT a typo
+          'Fields_ExpirationDate_Month' => :state_id_expiration_month,
+          'Fields_ExpirationDate_Year' => :state_id_expiration_year,
         }.freeze
         attr_reader :config
 
@@ -95,7 +98,23 @@ module IdentityDocAuth
           end
 
           pii[:state_id_type] = 'drivers_license'
-          pii[:dob] = "#{pii[:dob_month]}/#{pii[:dob_day]}/#{pii[:dob_year]}"
+
+          if pii[:dob_month] && pii[:dob_day] && pii[:dob_year]
+            pii[:dob] = [
+              pii.delete(:dob_month),
+              pii.delete(:dob_day),
+              pii.delete(:dob_year),
+            ].join('/')
+          end
+
+          if pii[:state_id_expiration_month] && pii[:state_id_expiration_day] && pii[:state_id_expiration_year]
+            pii[:state_id_expiration] = [
+              pii.delete(:state_id_expiration_month),
+              pii.delete(:state_id_expiration_day),
+              pii.delete(:state_id_expiration_year),
+            ].join('/')
+          end
+
           pii
         end
 

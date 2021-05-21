@@ -49,6 +49,7 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
       state_id_number: '1111111111111',
       state_id_jurisdiction: 'ND',
       state_id_type: 'drivers_license',
+      state_id_expiration: '12/31/2099',
       phone: nil,
     )
 
