@@ -39,7 +39,6 @@ module IdentityDocAuth
 
       def fetch
         http_response = send_http_request
-        return handle_invalid_response(http_response) unless http_response.success?
 
         if http_response.success?
           handle_http_response(http_response)
