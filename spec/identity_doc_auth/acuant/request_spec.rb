@@ -116,10 +116,6 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
 
     context 'when the request resolves with a 404 status it retries' do
       it 'calls exception_notifier each retry' do
-        # allow(subject).to receive(:handle_http_response) do |http_response|
-        #   http_response
-        # end
-
         stub_request(:get, full_url).
           with(headers: request_headers).
           to_return(
