@@ -48,8 +48,6 @@ module IdentityDocAuth
         end
 
         def pii_from_doc
-          return {} unless successful_result?
-
           IdentityDocAuth::Acuant::PiiFromDoc.new(parsed_response_body).call
         end
 

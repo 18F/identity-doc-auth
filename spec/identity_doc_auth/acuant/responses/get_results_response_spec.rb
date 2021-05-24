@@ -107,6 +107,29 @@ RSpec.describe IdentityDocAuth::Acuant::Responses::GetResultsResponse do
     end
   end
 
+  context 'when there are errors and still parsed PII fields' do
+    let(:http_response) do
+      instance_double(
+        Faraday::Response,
+        body: AcuantFixtures.get_results_response_expired,
+      )
+    end
+
+    it 'is not sucessful, has errors, and still has pii_from_doc' do
+      aggregate_failures do
+        expect(response.success?).to eq(false)
+
+        expect(response.errors).to eq(id: [IdentityDocAuth::Errors::DOCUMENT_EXPIRED_CHECK])
+
+        expect(response.pii_from_doc).to include(
+          first_name: "FAKEY",
+          last_name: "MCFAKERSON",
+          state_id_expiration: "01/14/2021",
+        )
+      end
+    end
+  end
+
   context 'with a failed result' do
     let(:http_response) do
       instance_double(
