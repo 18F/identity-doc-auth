@@ -152,5 +152,58 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
         expect(response.exception).to be_a(Faraday::ConnectionFailed)
       end
     end
+
+    context 'when the request resolves with a handled http error status' do
+      before do
+        allow(subject).to receive(:handle_http_response) do |http_response|
+          http_response
+        end
+      end
+
+      def shared_expects(response)
+        expect(response.success?).to eq(false)
+        expect(response.exception).to be_kind_of(IdentityDocAuth::RequestError)
+        expect(response.exception.message).not_to be_empty
+      end
+
+      it 'it produces a 438 error' do
+        stub_request(:get, full_url).
+          with(headers: request_headers).
+          to_return({ body: 'test response body', status: 438 })
+
+        expect(exception_notifier).not_to receive(:call)
+
+        response = subject.fetch
+
+        shared_expects(response)
+        expect(response.errors).to eq({ general: [IdentityDocAuth::Errors::IMAGE_LOAD_FAILURE] })
+      end
+
+      it 'it produces a 439 error' do
+        stub_request(:get, full_url).
+          with(headers: request_headers).
+          to_return({ body: 'test response body', status: 439 })
+
+        expect(exception_notifier).not_to receive(:call)
+
+        response = subject.fetch
+
+        shared_expects(response)
+        expect(response.errors).to eq({ general: [IdentityDocAuth::Errors::PIXEL_DEPTH_FAILURE] })
+      end
+
+      it 'it produces a 440 error' do
+        stub_request(:get, full_url).
+          with(headers: request_headers).
+          to_return({ body: 'test response body', status: 440 })
+
+        expect(exception_notifier).not_to receive(:call)
+
+        response = subject.fetch
+
+        shared_expects(response)
+        expect(response.errors).to eq({ general: [IdentityDocAuth::Errors::IMAGE_SIZE_FAILURE] })
+      end
+    end
   end
 end
