@@ -1,8 +1,8 @@
 module IdentityDocAuth
   module Acuant
     # https://documentation.help/AssureID-Connect/Error%20Codes.html
-    # 438 and 439 are frequent errors that we do not want to be notified of
-    IGNORED_ERROR_CODES = Set[438, 439, 440]
+    # 438, 439, and 440 are frequent errors that we do not want to be notified of
+    HANDLED_HTTP_CODES = Set[438, 439, 440]
 
     class Request
       attr_reader :config
@@ -39,9 +39,16 @@ module IdentityDocAuth
 
       def fetch
         http_response = send_http_request
-        return handle_invalid_response(http_response) unless http_response.success?
 
-        handle_http_response(http_response)
+        if http_response.success?
+          handle_http_response(http_response)
+        else
+          if HANDLED_HTTP_CODES.include?(http_response.status)
+            handle_expected_http_error(http_response)
+          else
+            handle_invalid_response(http_response)
+          end
+        end
       rescue Faraday::ConnectionFailed, Faraday::TimeoutError => e
         handle_connection_error(e)
       end
@@ -94,19 +101,35 @@ module IdentityDocAuth
         { open_timeout: timeout, timeout: timeout }
       end
 
-      def handle_invalid_response(http_response)
+      def create_http_exception(http_response)
         message = [
           self.class.name,
           'Unexpected HTTP response',
           http_response.status,
         ].join(' ')
-        exception = IdentityDocAuth::RequestError.new(message, http_response.status)
-        send_exception_notification(exception)
+        IdentityDocAuth::RequestError.new(message, http_response.status)
+      end
+
+      def handle_expected_http_error(http_response)
+        error = case http_response.status
+          when 438
+            Errors::IMAGE_LOAD_FAILURE
+          when 439
+            Errors::PIXEL_DEPTH_FAILURE
+          when 440
+            Errors::IMAGE_SIZE_FAILURE
+        end
+
         IdentityDocAuth::Response.new(
           success: false,
-          errors: { network: true },
-          exception: exception,
+          errors: { general: [error] },
+          exception: create_http_exception(http_response)
         )
+      end
+
+      def handle_invalid_response(http_response)
+        exception = create_http_exception(http_response)
+        handle_connection_error(exception)
       end
 
       def handle_connection_error(exception)
@@ -120,7 +143,7 @@ module IdentityDocAuth
 
       def send_exception_notification(exception, custom_params = nil)
         return if exception.is_a?(IdentityDocAuth::RequestError) &&
-          IGNORED_ERROR_CODES.include?(exception.error_code)
+          HANDLED_HTTP_CODES.include?(exception.error_code)
         config.exception_notifier&.call(exception, custom_params)
       end
     end

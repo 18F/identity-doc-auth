@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Acuant::Request do
+
+  class SimpleAcuantRequest < IdentityDocAuth::Acuant::Request
+    def handle_http_response(http_response)
+      http_response.body.upcase!
+      http_response
+    end
+  end
+
   let(:assure_id_url) { 'https://acuant.assureid.example.com' }
   let(:assure_id_username) { 'acuant.username' }
   let(:assure_id_password) { 'acuant.password' }
@@ -33,7 +41,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
   end
 
   subject do
-    request = described_class.new(config: config)
+    request = SimpleAcuantRequest.new(config: config)
     allow(request).to receive(:path).and_return(path)
     allow(request).to receive(:body).and_return(request_body)
     allow(request).to receive(:method).and_return(request_method)
@@ -43,17 +51,13 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
   describe '#fetch' do
     context 'when the request resolves with a 200' do
       it 'calls handle_http_response on the subclass' do
-        allow(subject).to receive(:handle_http_response) do |http_response|
-          http_response.body.upcase
-        end
-
         stub_request(:get, full_url).
           with(headers: request_headers).
           to_return(body: 'test response body', status: 200)
 
         response = subject.fetch
 
-        expect(response).to eq('TEST RESPONSE BODY')
+        expect(response.body).to eq('TEST RESPONSE BODY')
       end
     end
 
@@ -61,17 +65,13 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
       let(:request_method) { :post }
 
       it 'sends a post request with a request body' do
-        allow(subject).to receive(:handle_http_response) do |http_response|
-          http_response.body.upcase
-        end
-
         stub_request(:post, full_url).
           with(headers: request_headers, body: request_body).
           to_return(body: 'test response body', status: 200)
 
         response = subject.fetch
 
-        expect(response).to eq('TEST RESPONSE BODY')
+        expect(response.body).to eq('TEST RESPONSE BODY')
       end
     end
 
@@ -86,18 +86,12 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
 
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(network: true)
-        expect(response.exception.message).to eq(
-          'IdentityDocAuth::Acuant::Request Unexpected HTTP response 404',
-        )
+        expect(response.exception.message).to include('Unexpected HTTP response 404')
       end
     end
 
     context 'when the request resolves with retriable error then succeeds it only retries once' do
       it 'calls exception_notifier each retry' do
-        allow(subject).to receive(:handle_http_response) do |http_response|
-          http_response
-        end
-
         stub_request(:get, full_url).
           with(headers: request_headers).
           to_return(
@@ -116,10 +110,6 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
 
     context 'when the request resolves with a 404 status it retries' do
       it 'calls exception_notifier each retry' do
-        allow(subject).to receive(:handle_http_response) do |http_response|
-          http_response
-        end
-
         stub_request(:get, full_url).
           with(headers: request_headers).
           to_return(
@@ -150,6 +140,53 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
         expect(response.success?).to eq(false)
         expect(response.errors).to eq(network: true)
         expect(response.exception).to be_a(Faraday::ConnectionFailed)
+      end
+    end
+
+    context 'when the request resolves with a handled http error status' do
+      def expect_failed_response(response)
+        expect(response.success?).to eq(false)
+        expect(response.exception).to be_kind_of(IdentityDocAuth::RequestError)
+        expect(response.exception.message).not_to be_empty
+      end
+
+      it 'it produces a 438 error' do
+        stub_request(:get, full_url).
+          with(headers: request_headers).
+          to_return(body: 'test response body', status: 438)
+
+        expect(exception_notifier).not_to receive(:call)
+
+        response = subject.fetch
+
+        expect_failed_response(response)
+        expect(response.errors).to eq(general: [IdentityDocAuth::Errors::IMAGE_LOAD_FAILURE])
+      end
+
+      it 'it produces a 439 error' do
+        stub_request(:get, full_url).
+          with(headers: request_headers).
+          to_return(body: 'test response body', status: 439)
+
+        expect(exception_notifier).not_to receive(:call)
+
+        response = subject.fetch
+
+        expect_failed_response(response)
+        expect(response.errors).to eq(general: [IdentityDocAuth::Errors::PIXEL_DEPTH_FAILURE])
+      end
+
+      it 'it produces a 440 error' do
+        stub_request(:get, full_url).
+          with(headers: request_headers).
+          to_return(body: 'test response body', status: 440)
+
+        expect(exception_notifier).not_to receive(:call)
+
+        response = subject.fetch
+
+        expect_failed_response(response)
+        expect(response.errors).to eq(general: [IdentityDocAuth::Errors::IMAGE_SIZE_FAILURE])
       end
     end
   end
