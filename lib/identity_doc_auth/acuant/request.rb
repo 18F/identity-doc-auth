@@ -1,3 +1,5 @@
+require 'active_support/notifications'
+
 module IdentityDocAuth
   module Acuant
     # https://documentation.help/AssureID-Connect/Error%20Codes.html
@@ -16,6 +18,10 @@ module IdentityDocAuth
       end
 
       def body
+        raise NotImplementedError
+      end
+
+      def metric_name
         raise NotImplementedError
       end
 
@@ -65,11 +71,14 @@ module IdentityDocAuth
       end
 
       def send_http_get_request
-        faraday_connection.get
+        faraday_connection.get do |req|
+          req.options.context = { service_name: metric_name }
+        end
       end
 
       def send_http_post_request
         faraday_connection.post do |req|
+          req.options.context = { service_name: metric_name }
           req.body = body
         end
       end
@@ -91,6 +100,7 @@ module IdentityDocAuth
             config.assure_id_username,
             config.assure_id_password,
           )
+          conn.request :instrumentation, name: 'request_metric.faraday'
           conn.request :retry, retry_options
           conn.adapter :net_http
         end
