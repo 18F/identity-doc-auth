@@ -27,6 +27,10 @@ module IdentityDocAuth
         def method
           :get
         end
+
+        def metric_name
+          'acuant_doc_auth_get_results'
+        end
       end
     end
   end

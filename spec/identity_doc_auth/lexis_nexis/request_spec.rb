@@ -6,6 +6,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Request do
   let(:base_url) { 'https://lexis.nexis.example.com' }
   let(:path) { "/restws/identity/v3/accounts/#{account_id}/workflows/#{workflow}/conversations" }
   let(:full_url) { base_url + path }
+  let(:metric_name) { 'lexis_nexis' }
 
   let(:config) do
     IdentityDocAuth::LexisNexis::Config.new(
@@ -23,6 +24,7 @@ RSpec.describe IdentityDocAuth::LexisNexis::Request do
       allow(subject).to receive(:workflow).and_return(workflow)
       allow(subject).to receive(:body).and_return('test_body')
       allow(subject).to receive(:method).and_return(http_method)
+      allow(request).to receive(:metric_name).and_return(metric_name)
 
       stub_request(http_method, full_url).to_return(status: status, body: '')
     end

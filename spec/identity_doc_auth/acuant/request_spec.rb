@@ -15,6 +15,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
 
   let(:path) { '/test/path' }
   let(:full_url) { URI.join(assure_id_url, path) }
+  let(:metric_name) { 'acuant' }
   let(:request_body) { 'test request body' }
   let(:request_headers) do
     username = assure_id_username
@@ -45,6 +46,7 @@ RSpec.describe IdentityDocAuth::Acuant::Request do
     allow(request).to receive(:path).and_return(path)
     allow(request).to receive(:body).and_return(request_body)
     allow(request).to receive(:method).and_return(request_method)
+    allow(request).to receive(:metric_name).and_return(metric_name)
     request
   end
 

@@ -67,6 +67,10 @@ module IdentityDocAuth
         def encode(image)
           Base64.strict_encode64(image)
         end
+
+        def metric_name
+          'lexis_nexis_doc_auth_true_id'
+        end
       end
     end
   end

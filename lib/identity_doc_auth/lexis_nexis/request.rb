@@ -1,4 +1,5 @@
 require 'faraday'
+require 'active_support/notifications'
 
 module IdentityDocAuth
   module LexisNexis
@@ -16,6 +17,10 @@ module IdentityDocAuth
         handle_http_response(http_response)
       rescue Faraday::ConnectionFailed, Faraday::TimeoutError => e
         handle_connection_error(e)
+      end
+
+      def metric_name
+        raise NotImplementedError
       end
 
       private
@@ -54,11 +59,14 @@ module IdentityDocAuth
       end
 
       def send_http_get_request
-        faraday_connection.get
+        faraday_connection.get do |req|
+          req.options.context = { service_name: metric_name }
+        end
       end
 
       def send_http_post_request
         faraday_connection.post do |req|
+          req.options.context = { service_name: metric_name }
           req.body = body
         end
       end
@@ -77,6 +85,7 @@ module IdentityDocAuth
 
         Faraday.new(request: faraday_request_params, url: url.to_s, headers: headers) do |conn|
           conn.request :retry, retry_options
+          conn.request :instrumentation, name: 'request_metric.faraday'
           conn.basic_auth username, password
           conn.adapter :net_http
         end

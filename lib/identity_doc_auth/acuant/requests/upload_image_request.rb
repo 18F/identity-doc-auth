@@ -36,6 +36,10 @@ module IdentityDocAuth
         def method
           :post
         end
+
+        def metric_name
+          'acuant_doc_auth_upload_image'
+        end
       end
     end
   end
