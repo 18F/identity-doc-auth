@@ -101,18 +101,18 @@ module IdentityDocAuth
 
           if pii[:dob_month] && pii[:dob_day] && pii[:dob_year]
             pii[:dob] = [
+              pii.delete(:dob_year),
               pii.delete(:dob_month),
               pii.delete(:dob_day),
-              pii.delete(:dob_year),
-            ].join('/')
+            ].join('-')
           end
 
           if pii[:state_id_expiration_month] && pii[:state_id_expiration_day] && pii[:state_id_expiration_year]
             pii[:state_id_expiration] = [
+              pii.delete(:state_id_expiration_year),
               pii.delete(:state_id_expiration_month),
               pii.delete(:state_id_expiration_day),
-              pii.delete(:state_id_expiration_year),
-            ].join('/')
+            ].join('-')
           end
 
           pii

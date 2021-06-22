@@ -19,7 +19,7 @@ module IdentityDocAuth
         state_id_number: '1111111111111',
         state_id_jurisdiction: 'ND',
         state_id_type: 'drivers_license',
-        state_id_expiration: '12/31/2099',
+        state_id_expiration: '2099-12-31',
         phone: nil,
       }.freeze
 

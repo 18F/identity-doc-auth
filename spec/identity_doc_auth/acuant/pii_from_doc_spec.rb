@@ -16,8 +16,8 @@ RSpec.describe IdentityDocAuth::Acuant::PiiFromDoc do
         city: 'BISMARCK',
         state: 'ND',
         zipcode: '58501',
-        dob: '04/01/1984',
-        state_id_expiration: '10/24/2022',
+        dob: '1984-04-01',
+        state_id_expiration: '2022-10-24',
         state_id_number: 'DOE-84-1165',
         state_id_jurisdiction: 'ND',
         state_id_type: 'drivers_license',
@@ -27,11 +27,11 @@ RSpec.describe IdentityDocAuth::Acuant::PiiFromDoc do
 
   describe '#convert_date' do
     it 'parses and formats a date from the Acuant format' do
-      expect(pii_from_doc.convert_date('/Date(449625600000)/')).to eq('04/01/1984')
+      expect(pii_from_doc.convert_date('/Date(449625600000)/')).to eq('1984-04-01')
     end
 
     it 'parses and formats negative numbers' do
-      expect(pii_from_doc.convert_date('/Date(-985824000000)/')).to eq('10/06/1938')
+      expect(pii_from_doc.convert_date('/Date(-985824000000)/')).to eq('1938-10-06')
     end
 
     it 'is nil for a bad format' do
