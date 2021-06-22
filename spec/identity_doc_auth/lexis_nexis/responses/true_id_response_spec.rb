@@ -59,14 +59,14 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
       minimum_expected_hash = {
         first_name: 'DAVID',
         last_name: 'SAMPLE',
-        dob: '10/13/1986',
+        dob: '1986-10-13',
         state: 'MD',
       }
 
       expect(response.pii_from_doc).to include(minimum_expected_hash)
     end
     it 'includes expiration' do
-      expect(response.pii_from_doc).to include(state_id_expiration: '10/15/2099')
+      expect(response.pii_from_doc).to include(state_id_expiration: '2099-10-15')
     end
   end
 

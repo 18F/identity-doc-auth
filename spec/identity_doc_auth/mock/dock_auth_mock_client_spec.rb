@@ -45,11 +45,11 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
       city: 'GREAT FALLS',
       state: 'MT',
       zipcode: '59010',
-      dob: '10/06/1938',
+      dob: '1938-10-06',
       state_id_number: '1111111111111',
       state_id_jurisdiction: 'ND',
       state_id_type: 'drivers_license',
-      state_id_expiration: '12/31/2099',
+      state_id_expiration: '2099-12-31',
       phone: nil,
     )
 
@@ -67,7 +67,7 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
         city: Bayside
         state: NY
         zipcode: '11364'
-        dob: 10/06/1938
+        dob: 1938-10-06
         state_id_number: '111111111'
         state_id_jurisdiction: ND
         state_id_type: drivers_license
@@ -97,7 +97,7 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
       city: 'Bayside',
       state: 'NY',
       zipcode: '11364',
-      dob: '10/06/1938',
+      dob: '1938-10-06',
       state_id_number: '111111111',
       state_id_jurisdiction: 'ND',
       state_id_type: 'drivers_license',

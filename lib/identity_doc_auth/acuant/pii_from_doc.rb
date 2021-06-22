@@ -41,7 +41,7 @@ module IdentityDocAuth
         match = ACUANT_TIMESTAMP_FORMAT.match(date)
         return if !match || !match[:milliseconds]
 
-        Time.zone.at(match[:milliseconds].to_f / 1000).utc.strftime('%m/%d/%Y')
+        Time.zone.at(match[:milliseconds].to_f / 1000).utc.to_date.to_s
       end
 
       private

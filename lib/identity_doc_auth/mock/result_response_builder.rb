@@ -15,11 +15,11 @@ module IdentityDocAuth
         city: 'GREAT FALLS',
         state: 'MT',
         zipcode: '59010',
-        dob: '10/06/1938',
+        dob: '1938-10-06',
         state_id_number: '1111111111111',
         state_id_jurisdiction: 'ND',
         state_id_type: 'drivers_license',
-        state_id_expiration: '12/31/2099',
+        state_id_expiration: '2099-12-31',
         phone: nil,
       }.freeze
 
@@ -93,9 +93,9 @@ module IdentityDocAuth
       end
 
       def parse_yaml
-        data = YAML.safe_load(uploaded_file)
+        data = YAML.safe_load(uploaded_file, permitted_classes: [Date])
         if data.kind_of?(Hash)
-          data
+          JSON.parse(data.to_json) # converts Dates back to strings
         else
           { general: ["YAML data should have been a hash, got #{data.class}"] }
         end
