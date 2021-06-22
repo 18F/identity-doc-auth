@@ -37,7 +37,7 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
             city: Bayside
             state: NY
             zipcode: '11364'
-            dob: 10/06/1938
+            dob: 1938-10-06
             state_id_number: '111111111'
             state_id_jurisdiction: ND
             state_id_type: drivers_license
@@ -59,7 +59,7 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
           city: 'Bayside',
           state: 'NY',
           zipcode: '11364',
-          dob: '10/06/1938',
+          dob: '1938-10-06',
           state_id_number: '111111111',
           state_id_jurisdiction: 'ND',
           state_id_type: 'drivers_license',
