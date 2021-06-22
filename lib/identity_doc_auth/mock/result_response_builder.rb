@@ -93,9 +93,9 @@ module IdentityDocAuth
       end
 
       def parse_yaml
-        data = YAML.safe_load(uploaded_file)
+        data = YAML.safe_load(uploaded_file, permitted_classes: [Date])
         if data.kind_of?(Hash)
-          data
+          JSON.parse(data.to_json) # converts Dates back to strings
         else
           { general: ["YAML data should have been a hash, got #{data.class}"] }
         end
