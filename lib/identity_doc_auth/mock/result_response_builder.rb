@@ -95,7 +95,7 @@ module IdentityDocAuth
       def parse_yaml
         data = YAML.safe_load(uploaded_file, permitted_classes: [Date])
         if data.kind_of?(Hash)
-          if (m = data.dig('document', 'dob')&.match(%r{(?<month>\d{1,2})/(?<day>\d{1,2})/(?<year>\d{4})}))
+          if (m = data.dig('document', 'dob').to_s.match(%r{(?<month>\d{1,2})/(?<day>\d{1,2})/(?<year>\d{4})}))
             data['document']['dob'] = Date.new(m[:year].to_i, m[:month].to_i, m[:day].to_i)
           end
 
