@@ -67,6 +67,35 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
       end
     end
 
+    context 'with a yaml file containing PII and an american-style date' do
+      let(:input) do
+        <<~YAML
+          document:
+            first_name: Susan
+            last_name: Smith
+            middle_name: Q
+            address1: 1 Microsoft Way
+            address2: Apt 3
+            city: Bayside
+            state: NY
+            zipcode: '11364'
+            dob: 10/06/1938
+            state_id_number: '111111111'
+            state_id_jurisdiction: ND
+            state_id_type: drivers_license
+        YAML
+      end
+
+      it 'returns a result with that PII' do
+        response = builder.call
+
+        expect(response.success?).to eq(true)
+        expect(response.errors).to eq({})
+        expect(response.exception).to eq(nil)
+        expect(response.pii_from_doc).to include(dob: '1938-10-06')
+      end
+    end
+
     context 'with a yaml file containing a failed alert' do
       let(:input) do
         <<~YAML
