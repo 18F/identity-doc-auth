@@ -2,9 +2,6 @@
 require 'identity_doc_auth/errors'
 
 module IdentityDocAuth
-  class UnknownDocAuthError < StandardError; end
-  class UnknownDocAuthAlert < StandardError; end
-
   class ErrorGenerator
     attr_reader :config
 
@@ -67,8 +64,10 @@ module IdentityDocAuth
       alert_error_count += 1 if errors.include?(SELFIE)
 
       if alert_error_count < 1
-        e = UnknownDocAuthError.new('DocAuth failure escaped without useful errors')
-        config.exception_notifier&.call(e, { response_info: response_info }, true)
+        config.warn_notifier&.call(
+          message: 'DocAuth failure escaped without useful errors',
+          response_info: response_info,
+        )
 
         return { GENERAL => [general_error(liveness_enabled)] }
       # if the alert_error_count is 1 it is just passed along
@@ -186,9 +185,11 @@ module IdentityDocAuth
 
       return 0 if unknown_alerts.empty?
 
-      message = 'DocAuth vendor responded with alert name(s) we do not handle: ' + unknown_alerts.to_s
-      e = UnknownDocAuthAlert.new(message)
-      config.exception_notifier&.call(e, { response_info: response_info }, true)
+      config.warn_notifier&.call(
+        message: 'DocAuth vendor responded with alert name(s) we do not handle',
+        unknown_alerts: unknown_alerts,
+        response_info: response_info,
+      )
 
       unknown_fail_count
     end
