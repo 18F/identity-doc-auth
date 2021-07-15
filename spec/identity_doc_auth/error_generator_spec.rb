@@ -2,11 +2,11 @@ require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::ErrorGenerator do
 
-  let(:exception_notifier) { instance_double('Proc') }
+  let(:warn_notifier) { instance_double('Proc') }
 
   let(:config) do
     IdentityDocAuth::LexisNexis::Config.new(
-      exception_notifier: exception_notifier,
+      warn_notifier: warn_notifier,
     )
   end
 
@@ -110,8 +110,8 @@ RSpec.describe IdentityDocAuth::ErrorGenerator do
         failed: [{ name: 'Not a known alert', result: 'Failed' }]
       )
 
-      expect(exception_notifier).to receive(:call).
-        with(anything, hash_including(:response_info), true).twice
+      expect(warn_notifier).to receive(:call).
+        with(hash_including(:response_info, :message)).twice
 
       output = described_class.new(config).generate_doc_auth_errors(error_info)
 
@@ -128,8 +128,8 @@ RSpec.describe IdentityDocAuth::ErrorGenerator do
         ]
       )
 
-      expect(exception_notifier).to receive(:call).
-        with(anything, hash_including(:response_info), true).once
+      expect(warn_notifier).to receive(:call).
+        with(hash_including(:response_info, :message, :unknown_alerts)).once
 
       output = described_class.new(config).generate_doc_auth_errors(error_info)
 
@@ -144,8 +144,8 @@ RSpec.describe IdentityDocAuth::ErrorGenerator do
         failed: [{ name: 'Birth Date Crosscheck', result: 'Failed' }],
       )
 
-      expect(exception_notifier).to receive(:call).
-        with(anything, hash_including(:response_info), true).once
+      expect(warn_notifier).to receive(:call).
+        with(hash_including(:response_info, :message, :unknown_alerts)).once
 
       output = described_class.new(config).generate_doc_auth_errors(error_info)
 

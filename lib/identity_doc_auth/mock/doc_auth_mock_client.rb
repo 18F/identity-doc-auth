@@ -8,6 +8,10 @@ module IdentityDocAuth
     class DocAuthMockClient
       attr_reader :config
 
+      def initialize(**config_keywords)
+        @config = Config.new(**config_keywords)
+      end
+
       class << self
         attr_reader :response_mocks
         attr_accessor :last_uploaded_front_image
@@ -75,13 +79,17 @@ module IdentityDocAuth
       def get_results(instance_id:, liveness_enabled:)
         return mocked_response_for_method(__method__) if method_mocked?(__method__)
 
-        config = Config.new(
-          dpi_threshold: 290,
-          sharpness_threshold: 40,
-          glare_threshold: 40,
-        )
+        overriden_config = config.dup.tap do |c|
+          c.dpi_threshold = 290
+          c.sharpness_threshold = 40
+          c.glare_threshold = 40
+        end
 
-        ResultResponseBuilder.new(self.class.last_uploaded_back_image, config, liveness_enabled).call
+        ResultResponseBuilder.new(
+          self.class.last_uploaded_back_image,
+          overriden_config,
+          liveness_enabled,
+        ).call
       end
 
       private

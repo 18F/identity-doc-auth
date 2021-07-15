@@ -17,6 +17,7 @@ module IdentityDocAuth
       :trueid_username,
       :timeout, # optional
       :exception_notifier, # optional
+      :warn_notifier, # optional
       :locale,
       :dpi_threshold,
       :sharpness_threshold,

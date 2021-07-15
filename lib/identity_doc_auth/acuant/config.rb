@@ -18,6 +18,7 @@ module IdentityDocAuth
       :sharpness_threshold,
       :glare_threshold,
       :exception_notifier,
+      :warn_notifier,
       keyword_init: true,
       allowed_members: [
         :assure_id_subscription_id,

@@ -6,6 +6,7 @@ module IdentityDocAuth
       :dpi_threshold,
       :sharpness_threshold,
       :glare_threshold, # required
+      :warn_notifier,
       keyword_init: true,
       allowed_members: [
         :dpi_threshold,

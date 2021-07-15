@@ -2,12 +2,15 @@ require 'spec_helper'
 
 RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
   describe '#call' do
+    let(:warn_notifier) { instance_double('Proc') }
+
     subject(:builder) {
-      config = IdentityDocAuth::Mock::Config.new({
+      config = IdentityDocAuth::Mock::Config.new(
         dpi_threshold: 290,
         sharpness_threshold: 40,
         glare_threshold: 40,
-      })
+        warn_notifier: warn_notifier,
+      )
       described_class.new(input, config, false)
     }
 
@@ -114,6 +117,23 @@ RSpec.describe IdentityDocAuth::Mock::ResultResponseBuilder do
         expect(response.errors).to eq(back: [IdentityDocAuth::Errors::MULTIPLE_BACK_ID_FAILURES])
         expect(response.exception).to eq(nil)
         expect(response.pii_from_doc).to eq({})
+      end
+    end
+
+    context 'with a yaml file containing an unknown alert' do
+      let(:input) do
+        <<~YAML
+          failed_alerts:
+            - name: Some Made Up Error
+        YAML
+      end
+
+      it 'calls the warn_notifier' do
+        expect(warn_notifier).to receive(:call).with(hash_including(:message, :response_info)).twice
+
+        response = builder.call
+
+        expect(response.success?).to eq(false)
       end
     end
 
