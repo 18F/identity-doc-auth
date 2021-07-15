@@ -8,8 +8,8 @@ module IdentityDocAuth
     class DocAuthMockClient
       attr_reader :config
 
-      def initialize(config = nil)
-        @config = config || Config.new
+      def initialize(**config_keywords)
+        @config = Config.new(**config_keywords)
       end
 
       class << self
