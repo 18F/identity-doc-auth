@@ -46,31 +46,33 @@ module IdentityDocAuth
       private
 
       def errors
-        file_data = parsed_data_from_uploaded_file
+        @errors ||= begin
+          file_data = parsed_data_from_uploaded_file
 
-        if file_data.blank?
-          {}
-        else
-          doc_auth_result = file_data.dig('doc_auth_result')
-          image_metrics = file_data.dig('image_metrics')
-          failed = file_data.dig('failed_alerts')
-          passed = file_data.dig('passed_alerts')
-          liveness_result = file_data.dig('liveness_result')
-
-          if [doc_auth_result, image_metrics, failed, passed, liveness_result].any?(&:present?)
-            mock_args = {}
-            mock_args.merge!(doc_auth_result: doc_auth_result) if doc_auth_result.present?
-            mock_args.merge!(image_metrics: image_metrics.symbolize_keys) if image_metrics.present?
-            mock_args.merge!(failed: failed.map!(&:symbolize_keys)) if failed.present?
-            mock_args.merge!(passed: passed.map!(&:symbolize_keys)) if passed.present?
-            mock_args.merge!(liveness_result: liveness_result) if liveness_result.present?
-
-            fake_response_info = create_response_info(**mock_args)
-
-            ErrorGenerator.new(config).generate_doc_auth_errors(fake_response_info)
+          if file_data.blank?
+            {}
           else
-            # general is the key for errors that come from parsing
-            file_data if file_data.include?(:general)
+            doc_auth_result = file_data.dig('doc_auth_result')
+            image_metrics = file_data.dig('image_metrics')
+            failed = file_data.dig('failed_alerts')
+            passed = file_data.dig('passed_alerts')
+            liveness_result = file_data.dig('liveness_result')
+
+            if [doc_auth_result, image_metrics, failed, passed, liveness_result].any?(&:present?)
+              mock_args = {}
+              mock_args.merge!(doc_auth_result: doc_auth_result) if doc_auth_result.present?
+              mock_args.merge!(image_metrics: image_metrics.symbolize_keys) if image_metrics.present?
+              mock_args.merge!(failed: failed.map!(&:symbolize_keys)) if failed.present?
+              mock_args.merge!(passed: passed.map!(&:symbolize_keys)) if passed.present?
+              mock_args.merge!(liveness_result: liveness_result) if liveness_result.present?
+
+              fake_response_info = create_response_info(**mock_args)
+
+              ErrorGenerator.new(config).generate_doc_auth_errors(fake_response_info)
+            else
+              # general is the key for errors that come from parsing
+              file_data if file_data.include?(:general)
+            end
           end
         end
       end
