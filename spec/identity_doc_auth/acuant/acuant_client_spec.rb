@@ -26,6 +26,15 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
       expect(result.success?).to eq(true)
       expect(result.instance_id).to eq('this-is-a-test-instance-id') # instance ID from fixture
     end
+
+    context 'invalid cropping mode' do
+      let(:cropping_mode) { 'invalid' }
+
+      it 'raises an error' do
+        message = 'unknown cropping_mode=invalid'
+        expect { subject.create_document(cropping_mode: cropping_mode) }.to raise_error(message)
+      end
+    end
   end
 
   describe '#post_front_image' do

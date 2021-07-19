@@ -17,6 +17,10 @@ module IdentityDocAuth
 
       # @see IdentityDocAuth::CroppingModes
       def create_document(cropping_mode:)
+        if !CroppingModes::ALL.include?(cropping_mode)
+          raise "unknown cropping_mode=#{cropping_mode}"
+        end
+
         Requests::CreateDocumentRequest.new(config: config, cropping_mode: cropping_mode).fetch
       end
 
