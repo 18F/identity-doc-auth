@@ -34,7 +34,13 @@ module IdentityDocAuth
         raise NotImplementedError
       end
 
-      def post_images(front_image:, back_image:, selfie_image:, liveness_checking_enabled: nil, **)
+      def post_images(
+        front_image:,
+        back_image:,
+        selfie_image:,
+        liveness_checking_enabled: nil,
+        cropping_mode: nil
+      )
         Requests::TrueIdRequest.new(
           config: config,
           front_image: front_image,
