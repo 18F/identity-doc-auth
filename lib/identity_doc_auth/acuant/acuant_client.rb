@@ -15,6 +15,7 @@ module IdentityDocAuth
         @config = Config.new(**config_keywords)
       end
 
+      # @see IdentityDocAuth::CroppingModes
       def create_document(cropping_mode:)
         Requests::CreateDocumentRequest.new(config: config, cropping_mode: cropping_mode).fetch
       end

@@ -8,6 +8,7 @@ module IdentityDocAuth
         def initialize(config:, cropping_mode:)
           super(config: config)
 
+          # @see IdentityDocAuth::CroppingModes
           @cropping_mode = cropping_mode
         end
 
