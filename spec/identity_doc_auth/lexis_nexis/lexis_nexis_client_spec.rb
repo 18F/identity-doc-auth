@@ -126,6 +126,18 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
         expect(result.success?).to eq(false)
       end
     end
+
+    it 'ignores cropping_mode argument' do
+      result = client.post_images(
+        front_image: DocAuthImageFixtures.document_front_image,
+        back_image: DocAuthImageFixtures.document_back_image,
+        selfie_image: DocAuthImageFixtures.selfie_image,
+        liveness_checking_enabled: liveness_enabled,
+        cropping_mode: IdentityDocAuth::CroppingModes::NONE,
+      )
+
+      expect(result).to be_a(IdentityDocAuth::Response)
+    end
   end
 
   context 'when the request is not successful' do

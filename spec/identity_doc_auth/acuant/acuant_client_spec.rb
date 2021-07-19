@@ -4,6 +4,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
   let(:assure_id_url) { 'https://acuant.assure.example.com'}
   let(:facial_match_url) { 'https://acuant.facial.example.com' }
   let(:passlive_url) { 'https://acuant.passlive.example.com' }
+  let(:cropping_mode) { IdentityDocAuth::CroppingModes::NONE }
 
   subject(:client) do
     IdentityDocAuth::Acuant::AcuantClient.new(
@@ -14,14 +15,25 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
   end
 
   describe '#create_document' do
-    it 'sends a create document request' do
+    it 'sends a create document request with cropping mode' do
       url = URI.join(assure_id_url, '/AssureIDService/Document/Instance')
-      stub_request(:post, url).to_return(body: AcuantFixtures.create_document_response)
+      stub_request(:post, url).
+        with(body: hash_including(ImageCroppingMode: cropping_mode)).
+        to_return(body: AcuantFixtures.create_document_response)
 
-      result = subject.create_document
+      result = subject.create_document(cropping_mode: cropping_mode)
 
       expect(result.success?).to eq(true)
       expect(result.instance_id).to eq('this-is-a-test-instance-id') # instance ID from fixture
+    end
+
+    context 'invalid cropping mode' do
+      let(:cropping_mode) { 'invalid' }
+
+      it 'raises an error' do
+        message = 'unknown cropping_mode=invalid'
+        expect { subject.create_document(cropping_mode: cropping_mode) }.to raise_error(message)
+      end
     end
   end
 
@@ -111,6 +123,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
           back_image: DocAuthImageFixtures.document_back_image,
           selfie_image: DocAuthImageFixtures.selfie_image,
           liveness_checking_enabled: liveness_enabled,
+          cropping_mode: cropping_mode,
         )
 
         extra_expected_hash = {
@@ -134,6 +147,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
           back_image: DocAuthImageFixtures.document_back_image,
           selfie_image: DocAuthImageFixtures.selfie_image,
           liveness_checking_enabled: liveness_enabled,
+          cropping_mode: cropping_mode,
         )
 
         extra_expected_hash = {
@@ -158,6 +172,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
           back_image: DocAuthImageFixtures.document_back_image,
           selfie_image: DocAuthImageFixtures.selfie_image,
           liveness_checking_enabled: liveness_enabled,
+          cropping_mode: cropping_mode,
         )
 
         expect(result.success?).to eq(false)
@@ -196,7 +211,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
       url = URI.join(assure_id_url, '/AssureIDService/Document/Instance')
       stub_request(:post, url).to_return(body: '', status: 500)
 
-      result = subject.create_document
+      result = subject.create_document(cropping_mode: cropping_mode)
 
       expect(result.success?).to eq(false)
       expect(result.errors).to eq(network: true)
@@ -211,7 +226,7 @@ RSpec.describe IdentityDocAuth::Acuant::AcuantClient do
       url = URI.join(assure_id_url, '/AssureIDService/Document/Instance')
       stub_request(:post, url).to_raise(Faraday::TimeoutError.new('Connection failed'))
 
-      result = subject.create_document
+      result = subject.create_document(cropping_mode: cropping_mode)
 
       expect(result.success?).to eq(false)
       expect(result.errors).to eq(network: true)

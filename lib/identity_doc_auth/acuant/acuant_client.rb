@@ -15,8 +15,13 @@ module IdentityDocAuth
         @config = Config.new(**config_keywords)
       end
 
-      def create_document
-        Requests::CreateDocumentRequest.new(config: config).fetch
+      # @see IdentityDocAuth::CroppingModes
+      def create_document(cropping_mode:)
+        if !CroppingModes::ALL.include?(cropping_mode)
+          raise "unknown cropping_mode=#{cropping_mode}"
+        end
+
+        Requests::CreateDocumentRequest.new(config: config, cropping_mode: cropping_mode).fetch
       end
 
       def post_front_image(image:, instance_id:)
@@ -58,8 +63,14 @@ module IdentityDocAuth
         Requests::GetResultsRequest.new(config: config, instance_id: instance_id).fetch
       end
 
-      def post_images(front_image:, back_image:, selfie_image:, liveness_checking_enabled: nil)
-        document_response = create_document
+      def post_images(
+        front_image:,
+        back_image:,
+        selfie_image:,
+        cropping_mode:,
+        liveness_checking_enabled: nil
+      )
+        document_response = create_document(cropping_mode: cropping_mode)
         return document_response unless document_response.success?
 
         instance_id = document_response.instance_id
