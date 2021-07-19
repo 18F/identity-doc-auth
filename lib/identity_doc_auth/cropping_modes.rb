@@ -1,11 +1,11 @@
 module IdentityDocAuth
   module CroppingModes
     # No cropping is performed (default).
-    NONE = '0'
+    NONE = '0'.freeze
     # Automatically determine whether cropping is required. Not recommended.
-    AUTOMATIC = '1'
+    AUTOMATIC = '1'.freeze
     # Cropping is always performed.
-    ALWAYS = '3'
+    ALWAYS = '3'.freeze
 
     ALL = [
       NONE,
