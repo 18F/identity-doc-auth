@@ -4,6 +4,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
   describe '#fetch' do
     let(:assure_id_url) { 'https://acuant.assureid.example.com' }
     let(:assure_id_subscription_id) { '1234567' }
+    let(:cropping_mode) { IdentityDocAuth::CroppingModes::NONE }
 
     let(:url) { URI.join(assure_id_url, '/AssureIDService/Document/Instance') }
     let(:request_body) do
@@ -21,7 +22,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
           },
         },
         ImageCroppingExpectedSize: '1',
-        ImageCroppingMode: '1',
+        ImageCroppingMode: cropping_mode,
         ManualDocumentType: nil,
         ProcessMode: 0,
         SubscriptionId: assure_id_subscription_id,
@@ -45,7 +46,9 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
         body: response_body,
       )
 
-      response = described_class.new(config: config).fetch
+      request = described_class.new(config: config)
+      request.cropping_mode = cropping_mode
+      response = request.fetch
 
       expect(response.success?).to eq(true)
       expect(response.errors).to eq({})

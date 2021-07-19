@@ -136,4 +136,15 @@ RSpec.describe IdentityDocAuth::Mock::DocAuthMockClient do
       expect(post_images_response.errors).to eq(back_image: 'blurry')
     end
   end
+
+  it 'ignores cropping_mode argument' do
+    post_images_response = client.post_images(
+      front_image: DocAuthImageFixtures.document_front_image,
+      back_image: DocAuthImageFixtures.document_back_image,
+      selfie_image: nil,
+      cropping_mode: IdentityDocAuth::CroppingModes::NONE,
+    )
+
+    expect(post_images_response).to be_a(IdentityDocAuth::Response)
+  end
 end

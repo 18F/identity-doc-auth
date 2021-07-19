@@ -59,7 +59,7 @@ module IdentityDocAuth
         IdentityDocAuth::Response.new(success: true)
       end
 
-      def post_images(front_image:, back_image:, selfie_image:, liveness_checking_enabled: nil)
+      def post_images(front_image:, back_image:, selfie_image:, liveness_checking_enabled: nil, **)
         return mocked_response_for_method(__method__) if method_mocked?(__method__)
 
         document_response = create_document
