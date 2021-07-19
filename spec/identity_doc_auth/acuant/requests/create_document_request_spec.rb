@@ -46,9 +46,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
         body: response_body,
       )
 
-      request = described_class.new(config: config)
-      request.cropping_mode = cropping_mode
-      response = request.fetch
+      response = described_class.new(config: config, cropping_mode: cropping_mode).fetch
 
       expect(response.success?).to eq(true)
       expect(response.errors).to eq({})

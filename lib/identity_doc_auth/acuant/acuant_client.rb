@@ -16,9 +16,7 @@ module IdentityDocAuth
       end
 
       def create_document(cropping_mode:)
-        request = Requests::CreateDocumentRequest.new(config: config)
-        request.cropping_mode = cropping_mode
-        request.fetch
+        Requests::CreateDocumentRequest.new(config: config, cropping_mode: cropping_mode).fetch
       end
 
       def post_front_image(image:, instance_id:)

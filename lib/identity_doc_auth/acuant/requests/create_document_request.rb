@@ -5,7 +5,11 @@ module IdentityDocAuth
   module Acuant
     module Requests
       class CreateDocumentRequest < IdentityDocAuth::Acuant::Request
-        attr_accessor :cropping_mode
+        def initialize(config:, cropping_mode:)
+          super(config: config)
+
+          @cropping_mode = cropping_mode
+        end
 
         def path
           '/AssureIDService/Document/Instance'
@@ -30,7 +34,7 @@ module IdentityDocAuth
               },
             },
             ImageCroppingExpectedSize: '1',
-            ImageCroppingMode: cropping_mode,
+            ImageCroppingMode: @cropping_mode,
             ManualDocumentType: nil,
             ProcessMode: 0,
             SubscriptionId: config.assure_id_subscription_id,
