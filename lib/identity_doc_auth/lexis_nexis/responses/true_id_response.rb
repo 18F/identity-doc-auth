@@ -151,8 +151,8 @@ module IdentityDocAuth
           return false unless doc_auth_result_attention?
 
           parsed_alerts[:failed]&.count.to_i == 1 &&
-            parsed_alerts[:failed][0][:name] == '2D Barcode Read' &&
-            parsed_alerts[:failed][0][:result] == 'Attention'
+            parsed_alerts.dig(:failed, 0, :name) == '2D Barcode Read' &&
+            parsed_alerts.dig(:failed, 0, :result) == 'Attention'
         end
 
         def product_status_passed?
