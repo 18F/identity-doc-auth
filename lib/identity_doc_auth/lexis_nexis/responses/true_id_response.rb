@@ -168,11 +168,11 @@ module IdentityDocAuth
         end
 
         def doc_auth_result
-          true_id_product.dig(:AUTHENTICATION_RESULT, :DocAuthResult)
+          true_id_product&.dig(:AUTHENTICATION_RESULT, :DocAuthResult)
         end
 
         def product_status
-          true_id_product.dig(:ProductStatus)
+          true_id_product&.dig(:ProductStatus)
         end
 
         def true_id_product
