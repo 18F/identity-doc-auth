@@ -32,6 +32,9 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
   let(:failure_response_malformed) do
     instance_double(Faraday::Response, status: 200, body: LexisNexisFixtures.true_id_response_malformed)
   end
+  let(:attention_barcode_read) do
+    instance_double(Faraday::Response, status: 200, body: LexisNexisFixtures.true_id_barcode_read_attention)
+  end
 
   let(:exception_notifier) { proc { } }
 
@@ -43,6 +46,36 @@ RSpec.describe IdentityDocAuth::LexisNexis::Responses::TrueIdResponse do
 
   context 'when the response is a success' do
     let(:response) { described_class.new(success_response, false, config) }
+
+    it 'is a successful result' do
+      expect(response.successful_result?).to eq(true)
+    end
+    it 'has no error messages' do
+      expect(response.error_messages).to be_empty
+    end
+    it 'has extra attributes' do
+      extra_attributes = response.extra_attributes
+      expect(extra_attributes).not_to be_empty
+    end
+    it 'has PII data' do
+      # This is the minimum expected by doc_pii_form in the core IDP
+      minimum_expected_hash = {
+        first_name: 'DAVID',
+        last_name: 'SAMPLE',
+        dob: '1986-10-13',
+        state: 'MD',
+      }
+
+      expect(response.pii_from_doc).to include(minimum_expected_hash)
+    end
+    it 'includes expiration' do
+      expect(response.pii_from_doc).to include(state_id_expiration: '2099-10-15')
+    end
+  end
+
+
+  context 'when the barcode can not be read' do
+    let(:response) { described_class.new(attention_barcode_read, false, config) }
 
     it 'is a successful result' do
       expect(response.successful_result?).to eq(true)

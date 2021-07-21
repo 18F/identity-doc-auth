@@ -7,6 +7,10 @@ module LexisNexisFixtures
     load_response_fixture('true_id_response_success_2.json')
   end
 
+  def self.true_id_barcode_read_attention
+    load_response_fixture('true_id_response_attention_barcode.json')
+  end
+
   def self.true_id_response_failure_no_liveness
     load_response_fixture('true_id_response_failure_no_liveness.json')
   end
