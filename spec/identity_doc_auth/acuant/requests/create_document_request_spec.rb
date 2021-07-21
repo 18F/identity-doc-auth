@@ -4,7 +4,9 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
   describe '#fetch' do
     let(:assure_id_url) { 'https://acuant.assureid.example.com' }
     let(:assure_id_subscription_id) { '1234567' }
-    let(:cropping_mode) { IdentityDocAuth::CroppingModes::NONE }
+    let(:image_source) { IdentityDocAuth::ImageSources::UNKNOWN }
+    let(:cropping_mode) { IdentityDocAuth::Acuant::CroppingModes::ALWAYS }
+    let(:sensor_type) { IdentityDocAuth::Acuant::SensorTypes::UNKNOWN }
 
     let(:url) { URI.join(assure_id_url, '/AssureIDService/Document/Instance') }
     let(:request_body) do
@@ -18,7 +20,7 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
           Type: {
             Manufacturer: 'Login.gov',
             Model: 'Doc Auth 1.0',
-            SensorType: '3',
+            SensorType: sensor_type,
           },
         },
         ImageCroppingExpectedSize: '1',
@@ -39,20 +41,48 @@ RSpec.describe IdentityDocAuth::Acuant::Requests::CreateDocumentRequest do
       )
     end
 
-    it 'sends a well formed request and returns a response with the instance ID' do
-      request_stub = stub_request(:post, url).with(
-        body: request_body,
-      ).to_return(
-        body: response_body,
-      )
+    context 'acuant sdk image source' do
+      let(:image_source) { IdentityDocAuth::ImageSources::ACUANT_SDK }
+      let(:cropping_mode) { IdentityDocAuth::Acuant::CroppingModes::NONE }
+      let(:sensor_type) { IdentityDocAuth::Acuant::SensorTypes::MOBILE }
 
-      response = described_class.new(config: config, cropping_mode: cropping_mode).fetch
+      it 'sends a well formed request and returns a response with the instance ID' do
+        request_stub = stub_request(:post, url).with(
+          body: request_body,
+        ).to_return(
+          body: response_body,
+        )
 
-      expect(response.success?).to eq(true)
-      expect(response.errors).to eq({})
-      expect(response.exception).to be_nil
-      expect(response.instance_id).to eq('this-is-a-test-instance-id') # instance ID from fixture
-      expect(request_stub).to have_been_requested
+        response = described_class.new(config: config, image_source: image_source).fetch
+
+        expect(response.success?).to eq(true)
+        expect(response.errors).to eq({})
+        expect(response.exception).to be_nil
+        expect(response.instance_id).to eq('this-is-a-test-instance-id') # instance ID from fixture
+        expect(request_stub).to have_been_requested
+      end
+    end
+
+    context 'upload image source' do
+      let(:image_source) { IdentityDocAuth::ImageSources::UNKNOWN }
+      let(:cropping_mode) { IdentityDocAuth::Acuant::CroppingModes::ALWAYS }
+      let(:sensor_type) { IdentityDocAuth::Acuant::SensorTypes::UNKNOWN }
+
+      it 'sends a well formed request and returns a response with the instance ID' do
+        request_stub = stub_request(:post, url).with(
+          body: request_body,
+        ).to_return(
+          body: response_body,
+        )
+
+        response = described_class.new(config: config, image_source: image_source).fetch
+
+        expect(response.success?).to eq(true)
+        expect(response.errors).to eq({})
+        expect(response.exception).to be_nil
+        expect(response.instance_id).to eq('this-is-a-test-instance-id') # instance ID from fixture
+        expect(request_stub).to have_been_requested
+      end
     end
   end
 end

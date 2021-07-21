@@ -15,13 +15,13 @@ module IdentityDocAuth
         @config = Config.new(**config_keywords)
       end
 
-      # @see IdentityDocAuth::CroppingModes
-      def create_document(cropping_mode:)
-        if !CroppingModes::ALL.include?(cropping_mode)
-          raise "unknown cropping_mode=#{cropping_mode}"
+      # @see IdentityDocAuth::ImageSources
+      def create_document(image_source:)
+        if !ImageSources::ALL.include?(image_source)
+          raise "unknown image_source=#{image_source}"
         end
 
-        Requests::CreateDocumentRequest.new(config: config, cropping_mode: cropping_mode).fetch
+        Requests::CreateDocumentRequest.new(config: config, image_source: image_source).fetch
       end
 
       def post_front_image(image:, instance_id:)
@@ -67,10 +67,10 @@ module IdentityDocAuth
         front_image:,
         back_image:,
         selfie_image:,
-        cropping_mode:,
+        image_source:,
         liveness_checking_enabled: nil
       )
-        document_response = create_document(cropping_mode: cropping_mode)
+        document_response = create_document(image_source: image_source)
         return document_response unless document_response.success?
 
         instance_id = document_response.instance_id

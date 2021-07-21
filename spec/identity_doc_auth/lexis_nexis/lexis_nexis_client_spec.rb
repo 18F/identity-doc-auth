@@ -127,13 +127,13 @@ RSpec.describe IdentityDocAuth::LexisNexis::LexisNexisClient do
       end
     end
 
-    it 'ignores cropping_mode argument' do
+    it 'ignores image_source argument' do
       result = client.post_images(
         front_image: DocAuthImageFixtures.document_front_image,
         back_image: DocAuthImageFixtures.document_back_image,
         selfie_image: DocAuthImageFixtures.selfie_image,
         liveness_checking_enabled: liveness_enabled,
-        cropping_mode: IdentityDocAuth::CroppingModes::NONE,
+        image_source: IdentityDocAuth::ImageSources::UNKNOWN,
       )
 
       expect(result).to be_a(IdentityDocAuth::Response)

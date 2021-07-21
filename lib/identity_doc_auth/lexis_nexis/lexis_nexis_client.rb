@@ -39,7 +39,7 @@ module IdentityDocAuth
         back_image:,
         selfie_image:,
         liveness_checking_enabled: nil,
-        cropping_mode: nil
+        image_source: nil
       )
         Requests::TrueIdRequest.new(
           config: config,
