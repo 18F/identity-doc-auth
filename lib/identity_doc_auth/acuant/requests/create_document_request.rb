@@ -5,11 +5,11 @@ module IdentityDocAuth
   module Acuant
     module Requests
       class CreateDocumentRequest < IdentityDocAuth::Acuant::Request
-        def initialize(config:, cropping_mode:)
+        def initialize(config:, image_source:)
           super(config: config)
 
-          # @see IdentityDocAuth::CroppingModes
-          @cropping_mode = cropping_mode
+          # @see IdentityDocAuth::ImageSources
+          @image_source = image_source
         end
 
         def path
@@ -31,11 +31,11 @@ module IdentityDocAuth
               Type: {
                 Manufacturer: 'Login.gov',
                 Model: 'Doc Auth 1.0',
-                SensorType: '3',
+                SensorType: sensor_type,
               },
             },
             ImageCroppingExpectedSize: '1',
-            ImageCroppingMode: @cropping_mode,
+            ImageCroppingMode: cropping_mode,
             ManualDocumentType: nil,
             ProcessMode: 0,
             SubscriptionId: config.assure_id_subscription_id,
@@ -52,6 +52,28 @@ module IdentityDocAuth
 
         def metric_name
           'acuant_doc_auth_create_document'
+        end
+
+        private
+
+        def acuant_sdk_source?
+          @image_source == ImageSources::ACUANT_SDK
+        end
+
+        def cropping_mode
+          if acuant_sdk_source?
+            CroppingModes::NONE
+          else
+            CroppingModes::ALWAYS
+          end
+        end
+
+        def sensor_type
+          if acuant_sdk_source?
+            SensorTypes::MOBILE
+          else
+            SensorTypes::UNKNOWN
+          end
         end
       end
     end

@@ -64,7 +64,7 @@ module IdentityDocAuth
         back_image:,
         selfie_image:,
         liveness_checking_enabled: nil,
-        cropping_mode: nil
+        image_source: nil
       )
         return mocked_response_for_method(__method__) if method_mocked?(__method__)
 
