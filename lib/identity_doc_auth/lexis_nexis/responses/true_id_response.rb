@@ -55,10 +55,7 @@ module IdentityDocAuth
         end
 
         def successful_result?
-          transaction_status_passed? &&
-            true_id_product.present? &&
-            product_status_passed? &&
-            doc_auth_result_passed?
+          all_passed? || attention_with_barcode?
         end
 
         def error_messages
@@ -125,20 +122,37 @@ module IdentityDocAuth
         end
 
         def create_response_info
-          alerts = parse_alerts
+          alerts = parsed_alerts
 
           {
             conversation_id: conversation_id,
             reference: reference,
             liveness_enabled: @liveness_checking_enabled,
             vendor: 'TrueID',
+            transaction_status: transaction_status,
             transaction_reason_code: transaction_reason_code,
+            product_status: product_status,
             doc_auth_result: doc_auth_result,
             processed_alerts: alerts,
             alert_failure_count: alerts[:failed]&.count.to_i,
             portrait_match_results: true_id_product[:PORTRAIT_MATCH_RESULT],
             image_metrics: parse_image_metrics,
           }
+        end
+
+        def all_passed?
+          transaction_status_passed? &&
+            true_id_product.present? &&
+            product_status_passed? &&
+            doc_auth_result_passed?
+        end
+
+        def attention_with_barcode?
+          return false unless doc_auth_result_attention?
+
+          parsed_alerts[:failed]&.count.to_i == 1 &&
+            parsed_alerts.dig(:failed, 0, :name) == '2D Barcode Read' &&
+            parsed_alerts.dig(:failed, 0, :result) == 'Attention'
         end
 
         def product_status_passed?
@@ -149,20 +163,26 @@ module IdentityDocAuth
           doc_auth_result == 'Passed'
         end
 
+        def doc_auth_result_attention?
+          doc_auth_result == 'Attention'
+        end
+
         def doc_auth_result
-          true_id_product.dig(:AUTHENTICATION_RESULT, :DocAuthResult)
+          true_id_product&.dig(:AUTHENTICATION_RESULT, :DocAuthResult)
         end
 
         def product_status
-          true_id_product.dig(:ProductStatus)
+          true_id_product&.dig(:ProductStatus)
         end
 
         def true_id_product
           products[:TrueID] if products.present?
         end
 
-        def parse_alerts
-          new_alerts = { passed: [], failed: [] }
+        def parsed_alerts
+          return @new_alerts if defined?(@new_alerts)
+
+          @new_alerts = { passed: [], failed: [] }
           all_alerts = true_id_product[:AUTHENTICATION_RESULT].select do |key|
             key.start_with?('Alert_')
           end
@@ -172,13 +192,13 @@ module IdentityDocAuth
             alert_prefix = alert_name.scan(/Alert_\d{1,2}_/).first
             alert = combine_alert_data(all_alerts, alert_prefix)
             if alert[:result] == 'Passed'
-              new_alerts[:passed].push(alert)
+              @new_alerts[:passed].push(alert)
             else
-              new_alerts[:failed].push(alert)
+              @new_alerts[:failed].push(alert)
             end
           end
 
-          new_alerts
+          @new_alerts
         end
 
         def combine_alert_data(all_alerts, alert_name)
