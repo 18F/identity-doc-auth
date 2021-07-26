@@ -11,13 +11,16 @@ module IdentityDocAuth
     end
 
     def merge(other)
-      Response.new(
-        success: success? && other.success?,
-        errors: errors.merge(other.errors),
-        exception: exception || other.exception,
-        extra: extra.merge(other.extra),
-        pii_from_doc: pii_from_doc.merge(other.pii_from_doc),
-      )
+      # To maintain the subclass and avoid mutating the instance, set ivars on a clone.
+      clone = self.clone
+      clone.instance_eval do
+        @success = success? && other.success?
+        @errors = errors.merge(other.errors)
+        @exception = exception || other.exception
+        @extra = extra.merge(other.extra)
+        @pii_from_doc = pii_from_doc.merge(other.pii_from_doc)
+      end
+      clone
     end
 
     def success?
