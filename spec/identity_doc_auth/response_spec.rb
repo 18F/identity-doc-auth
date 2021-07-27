@@ -37,21 +37,6 @@ RSpec.describe IdentityDocAuth::Response do
       expect(merged).to be_kind_of(IdentityDocAuth::Response)
     end
 
-    context 'subclass response' do
-      let(:response) do
-        config = IdentityDocAuth::Acuant::Config.new
-        http_response = instance_double(
-          Faraday::Response,
-          body: AcuantFixtures.get_results_response_success,
-        )
-        IdentityDocAuth::Acuant::Responses::GetResultsResponse.new(http_response, config)
-      end
-
-      it 'maintains original subclass' do
-        expect(merged).to be_kind_of(IdentityDocAuth::Acuant::Responses::GetResultsResponse)
-      end
-    end
-
     describe 'success' do
       context 'both failure' do
         let(:success) { false }
